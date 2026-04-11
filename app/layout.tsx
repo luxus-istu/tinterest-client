@@ -1,7 +1,6 @@
-"use client";
-
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
+import StoreProvider from '@/store/StoreProvider'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -24,7 +23,9 @@ export default function RootLayout({
         <title>Tinterest</title>
         <meta name="description" content="Tinterest" />
       </head>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <StoreProvider>{children}</StoreProvider>
+      </body>
     </html>
   )
 }
