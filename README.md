@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tinterest 🎨
 
-## Getting Started
+A premium, feature-driven Pinterest-inspired client application built with modern web technologies and a Spring Boot backend.
 
-First, run the development server:
+## 🚀 Technical Stack
+
+- **Framework**: [Next.js 16.2](https://next.js) (Client-only mode)
+- **Runtime**: [Bun](https://bun.sh/) 1.x
+- **Styles**: [Tailwind CSS 4.0](https://tailwindcss.com/)
+- **Core**: React 19.2, TypeScript 5
+- **State Management**: [TanStack Query](https://tanstack.com/query) (Server State) & [Zustand](https://zustand-demo.pmnd.rs/) (UI State)
+
+## 🏗️ Architecture
+
+The project follows a **Feature-Driven** architecture:
+- `/features/[feature-name]`: Self-contained units with components, hooks, and services.
+- **Services Layer**: Centralized Spring API communication using native `fetch`.
+- **Backend**: Integrated with a Spring Boot API.
+
+## 🛠️ Getting Started
+
+### Prerequisites
+
+- [Bun](https://bun.sh/) installed on your machine.
+- Local Spring Boot backend running (default: `http://localhost:8080`).
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
+bun install
+```
+
+### Launch Instructions
+
+To start the development server:
+
+```bash
 bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Build & Deploy
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+To create a production build:
 
-## Learn More
+```bash
+bun run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+To run the production server:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+bun start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📐 Project Rules
 
-## Deploy on Vercel
+- **Client-Side First**: Purely client-side application. Interaction layer uses `"use client"` directive.
+- **API Proxy**: Frontend API calls to `/api` are automatically proxied to the Spring backend via `next.config.ts`.
+- **Absolute Imports**: Use `@/*` prefix for all project imports.
+- **Styling**: Prefer CSS variables and `@theme` blocks over inline Tailwind for repeated patterns.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
