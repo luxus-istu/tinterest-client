@@ -15,14 +15,15 @@
 - **Core**: React 19.2, TypeScript 5.
 
 ## 🏗️ Architecture (Spring-Friendly)
-- **Services Layer**: Centralize API calls to Spring in `/services` or `/features/api`. Use **Axios** with a consistent client instance (`/services/api.ts`) for auth/interceptors.
-- **Server State**: Use **TanStack Query** (React Query) for fetching from Spring to handle caching, loading, and error states. Use the Axios instance as the fetcher.
-- **UI State**: Keep state local where possible; use **Redux Toolkit** for global UI state only.
+- **Feature-Driven**: Organize by `/features/[feature-name]` containing components, hooks, and services.
+- **Services Layer**: Centralize API calls to Spring in `/services` or `/features/api`. Use a consistent client (e.g., native `fetch` with a wrapper for auth/headers).
+- **Server State**: Use **TanStack Query** (React Query) for fetching from Spring to handle caching, loading, and error states.
+- **UI State**: Keep state local where possible; use **Zustand** or **Context** for global UI state only.
 
 ## 🛠️ Project Rules
 - **Verify APIs**: This version of Next.js has breaking changes. **Always** check `node_modules/next/dist/docs/` before using new or complex APIs.
 - **Client-Side First**: This project is **purely client-side**. Use `"use client"` directive for all interactive components.
-- **Backend API**: The backend is written in **Spring**. Direct all API calls to the defined Spring endpoint using the centralized Axios client.
+- **Backend API**: The backend is written in **Spring**. Direct all API calls to the defined Spring endpoint.
 - **Styling**: Prefer CSS variables and `@theme` blocks in CSS files over inline Tailwind for repeated patterns.
 - **Imports**: Ensure absolute imports using `@/*` prefix.
 - **Formatting**: Adhere to `.prettierrc`. Run `bun run lint` before finishing.

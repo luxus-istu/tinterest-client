@@ -8,14 +8,13 @@ A premium, feature-driven Pinterest-inspired client application built with moder
 - **Runtime**: [Bun](https://bun.sh/) 1.x
 - **Styles**: [Tailwind CSS 4.0](https://tailwindcss.com/)
 - **Core**: React 19.2, TypeScript 5
-- **HTTP Client**: [Axios](https://axios-http.com/)
-- **State Management**: [TanStack Query](https://tanstack.com/query) (Server State) & [Redux Toolkit](https://redux-toolkit.js.org/) (UI State)
+- **State Management**: [TanStack Query](https://tanstack.com/query) (Server State) & [Zustand](https://zustand-demo.pmnd.rs/) (UI State)
 
 ## 🏗️ Architecture
 
 The project follows a **Feature-Driven** architecture:
 - `/features/[feature-name]`: Self-contained units with components, hooks, and services.
-- **Services Layer**: Centralized Spring API communication using **Axios** (`/services/api.ts`).
+- **Services Layer**: Centralized Spring API communication using native `fetch`.
 - **Backend**: Integrated with a Spring Boot API.
 
 ## 🛠️ Getting Started
