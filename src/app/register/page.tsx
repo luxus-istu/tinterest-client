@@ -11,6 +11,7 @@ import {
   TextField,
   FieldError,
 } from "@heroui/react";
+import Link from "next/link";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 type RegisterInputs = {
@@ -32,8 +33,8 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-2">
       <Card className="w-full max-w-lg shadow-xl">
         <Card.Header className="flex flex-col items-center gap-1 pb-2 text-center">
-          <Card.Title className="text-2xl font-bold">Регистрация</Card.Title>
-          <Card.Description>
+          <Card.Title className="text-2xl font-black">Регистрация</Card.Title>
+          <Card.Description className="font-medium text-center">
             Присоединяйтесь к Tinterest сегодня. Заполните свои данные, чтобы начать.
           </Card.Description>
         </Card.Header>
@@ -93,9 +94,9 @@ export default function RegisterPage() {
             </Button>
             <p className="text-center text-sm text-muted">
               Уже есть аккаунт?{" "}
-              <a className="font-medium text-accent hover:underline" href="/login">
+              <Link className="font-medium text-accent hover:underline" href="/login">
                 Войти
-              </a>
+              </Link>
             </p>
           </Card.Footer>
         </Form>
