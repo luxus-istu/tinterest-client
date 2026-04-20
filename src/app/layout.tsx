@@ -1,6 +1,6 @@
 import Theme from '../providers/Theme'
-import './globals.css'
 import { Manrope } from "next/font/google"
+import "../styles/globals.css"
 
 const manrope = Manrope({
   subsets: ['cyrillic', 'latin'],
