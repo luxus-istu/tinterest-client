@@ -1,4 +1,5 @@
 import Theme from '../providers/Theme'
+import QueryProvider from '../providers/QueryProvider'
 import { Manrope } from "next/font/google"
 import "../styles/globals.css"
 
@@ -14,7 +15,11 @@ export default function RootLayout({
   return (
     <html lang='en' className={manrope.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
-        <Theme>{children}</Theme>
+        <QueryProvider>
+          <Theme>
+            {children}
+          </Theme>
+        </QueryProvider>
       </body>
     </html>
   )

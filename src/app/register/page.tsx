@@ -12,21 +12,30 @@ import {
   FieldError,
 } from "@heroui/react";
 import Link from "next/link";
-import { SubmitHandler, useForm } from "react-hook-form";
-
-type RegisterInputs = {
-  firstName: string;
-  lastName: string;
-  gender: string;
-  email: string;
-  password: string;
-}
+import { Controller, type SubmitHandler, useForm } from "react-hook-form";
+import { useAuthActions } from "@/src/features/auth/hooks/useAuth";
+import type { RegisterRequest } from "@/src/features/auth/types";
+import { type AnchorHTMLAttributes, type DetailedHTMLProps, useState } from "react";
 
 export default function RegisterPage() {
-  const { register, handleSubmit } = useForm<RegisterInputs>();
+  const { register, handleSubmit, control, formState: { errors } } = useForm<RegisterRequest>({
+    defaultValues: {
+      gender: 'male'
+    }
+  });
+  const { register: registerAction, isRegistering } = useAuthActions();
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const onSubmit: SubmitHandler<RegisterInputs> = (data: RegisterInputs) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<RegisterRequest> = async (data) => {
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    try {
+      const response = await registerAction(data);
+      setSuccessMessage(response.message);
+    } catch (err: any) {
+      setErrorMessage(err.message || "Registration failed");
+    }
   };
 
   return (
@@ -38,68 +47,125 @@ export default function RegisterPage() {
             Присоединяйтесь к Tinterest сегодня. Заполните свои данные, чтобы начать.
           </Card.Description>
         </Card.Header>
-        <Form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-          <Card.Content className="flex flex-col gap-4">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <TextField isRequired name="firstName">
-                <Label>Имя</Label>
-                <Input placeholder="Иван" variant="secondary" {...register('firstName', { required: true, max: 255, min: 3 })} />
-                <FieldError />
-              </TextField>
-              <TextField isRequired name="lastName">
-                <Label>Фамилия</Label>
-                <Input placeholder="Иванов" variant="secondary" {...register('lastName', { required: true, max: 255, min: 3 })} />
-                <FieldError />
-              </TextField>
-            </div>
 
-            <RadioGroup isRequired orientation="horizontal" defaultValue={'male'}>
-              <Label>Пол</Label>
-              <div className="flex gap-4 pt-2" {...register('gender', { required: true })}>
-                <Radio value="male" >
-                  <Radio.Control>
-                    <Radio.Indicator />
-                  </Radio.Control>
-                  <Radio.Content>
-                    <Label>Мужской</Label>
-                  </Radio.Content>
-                </Radio>
-                <Radio value="female">
-                  <Radio.Control>
-                    <Radio.Indicator />
-                  </Radio.Control>
-                  <Radio.Content>
-                    <Label>Женский</Label>
-                  </Radio.Content>
-                </Radio>
-              </div>
-              <FieldError />
-            </RadioGroup>
-
-            <TextField isRequired name="email" type="email">
-              <Label>Почта</Label>
-              <Input placeholder="ivan@email.com" variant="secondary"{...register('email', { required: true })} />
-              <FieldError />
-            </TextField>
-
-            <TextField isRequired name="password" type="password">
-              <Label>Пароль</Label>
-              <Input placeholder="••••••••" variant="secondary" {...register('password', { required: true, max: 255, min: 8 })} />
-              <FieldError />
-            </TextField>
-          </Card.Content>
-          <Card.Footer className="flex flex-col gap-4 pt-2">
-            <Button className="w-full" size="lg" type="submit">
-              Зарегистрироваться
+        {successMessage ? (
+          <Card.Content className="flex flex-col items-center gap-4 py-6 text-center text-success">
+            <p className="text-lg font-bold">{successMessage}</p>
+            <Button
+              variant="primary"
+              render={(props) => <Link {...props as DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>} href="/login" />}
+            >
+              Перейти ко входу
             </Button>
-            <p className="text-center text-sm text-muted">
-              Уже есть аккаунт?{" "}
-              <Link className="font-medium text-accent hover:underline" href="/login">
-                Войти
-              </Link>
-            </p>
-          </Card.Footer>
-        </Form>
+          </Card.Content>
+        ) : (
+          <Form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+            <Card.Content className="flex flex-col gap-4">
+              {errorMessage && (
+                <div className="rounded-lg bg-danger/10 p-3 text-sm text-danger">
+                  {errorMessage}
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <TextField isRequired isInvalid={!!errors.firstName} name="firstName">
+                  <Label>Имя</Label>
+                  <Input
+                    placeholder="Иван"
+                    variant="secondary"
+                    {...register('firstName', { required: "Введите имя", minLength: { value: 2, message: "Минимум 2 символа" } })}
+                  />
+                  <FieldError>{errors.firstName?.message}</FieldError>
+                </TextField>
+                <TextField isRequired isInvalid={!!errors.lastName} name="lastName">
+                  <Label>Фамилия</Label>
+                  <Input
+                    placeholder="Иванов"
+                    variant="secondary"
+                    {...register('lastName', { required: "Введите фамилию", minLength: { value: 2, message: "Минимум 2 символа" } })}
+                  />
+                  <FieldError>{errors.lastName?.message}</FieldError>
+                </TextField>
+              </div>
+
+              <Controller
+                control={control}
+                name="gender"
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <RadioGroup
+                    isRequired
+                    orientation="horizontal"
+                    value={field.value}
+                    onChange={field.onChange}
+                  >
+                    <Label>Пол</Label>
+                    <div className="flex gap-4 pt-2">
+                      <Radio value="male">
+                        <Radio.Control>
+                          <Radio.Indicator />
+                        </Radio.Control>
+                        <Radio.Content>
+                          <Label>Мужской</Label>
+                        </Radio.Content>
+                      </Radio>
+                      <Radio value="female">
+                        <Radio.Control>
+                          <Radio.Indicator />
+                        </Radio.Control>
+                        <Radio.Content>
+                          <Label>Женский</Label>
+                        </Radio.Content>
+                      </Radio>
+                    </div>
+                  </RadioGroup>
+                )}
+              />
+
+              <TextField isRequired isInvalid={!!errors.email} name="email" type="email">
+                <Label>Почта</Label>
+                <Input
+                  placeholder="ivan@email.com"
+                  variant="secondary"
+                  {...register('email', {
+                    required: true,
+                    pattern: { value: /^\S+@\S+$/i, message: "Некорректная почта" }
+                  })}
+                />
+                <FieldError>{errors.email?.message}</FieldError>
+              </TextField>
+
+              <TextField isRequired isInvalid={!!errors.password} name="password" type="password">
+                <Label>Пароль</Label>
+                <Input
+                  placeholder="••••••••"
+                  variant="secondary"
+                  {...register('password', {
+                    required: true,
+                    minLength: { value: 8, message: "Минимум 8 символов" }
+                  })}
+                />
+                <FieldError>{errors.password?.message}</FieldError>
+              </TextField>
+            </Card.Content>
+            <Card.Footer className="flex flex-col gap-4 pt-2">
+              <Button
+                className="w-full"
+                size="lg"
+                type="submit"
+                isDisabled={isRegistering}
+              >
+                Зарегистрироваться
+              </Button>
+              <p className="text-center text-sm text-muted">
+                Уже есть аккаунт?{" "}
+                <Link className="font-medium text-accent hover:underline" href="/login">
+                  Войти
+                </Link>
+              </p>
+            </Card.Footer>
+          </Form>
+        )}
       </Card>
     </div>
   );
