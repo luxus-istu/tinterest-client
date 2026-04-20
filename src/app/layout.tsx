@@ -1,6 +1,6 @@
 import Theme from '../providers/Theme'
-import './globals.css'
-import { Manrope } from 'next/font/google'
+import { Manrope } from "next/font/google"
+import "../styles/globals.css";
 import type { ReactNode } from 'react'
 
 const manrope = Manrope({
