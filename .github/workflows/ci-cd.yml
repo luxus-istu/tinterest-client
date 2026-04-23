@@ -37,11 +37,6 @@ jobs:
       - name: Build
         run: bun run build
 
-      - name: 'notify vercel'
-        uses: 'vercel/repository-dispatch/actions/status@v1'
-        with:
-          name: "Vercel - tinterest-client: checks"
-
   docker-publish:
     name: Build and Push Docker Image
     needs: ci
