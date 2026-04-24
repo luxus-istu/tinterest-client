@@ -1,23 +1,13 @@
-import { apiClient } from "@/src/lib/api/client";
 import {
   LoginRequest,
   LoginResponse,
+  ResendEmailOtpRequest,
+  ResendEmailOtpResponse,
   RegisterRequest,
   RegisterResponse,
-  RegisterResponseSchema
+  VerifyEmailOtpRequest,
+  VerifyEmailOtpResponse
 } from "../types";
-
-const ENDPONTS = {
-  REGISTER: "/auth/register",
-
-  EMAIL_VERIFY: "/auth/email/verify",
-  EMAIL_RESEND: "/auth/email/resend",
-
-  LOGIN: "/auth/login",
-  LOGOUT: "/auth/logout",
-
-  REFRESH: "/auth/refresh"
-} as const;
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -42,6 +32,25 @@ export const authApi = {
       return { email: data.email, message: "Код подтверждения отправлен на почту" };
     }
     throw new Error("Invalid email");
+  },
+
+  verifyEmailOtp: async (data: VerifyEmailOtpRequest): Promise<VerifyEmailOtpResponse> => {
+    await delay(800);
+    if (!data.email.trim()) {
+      throw new Error("Email is required");
+    }
+    if (data.otp === "123456") {
+      return { message: "Почта успешно подтверждена" };
+    }
+    throw new Error("Неверный код подтверждения");
+  },
+
+  resendEmailOtp: async (data: ResendEmailOtpRequest): Promise<ResendEmailOtpResponse> => {
+    await delay(700);
+    if (!data.email.trim()) {
+      throw new Error("Email is required");
+    }
+    return { message: "Новый код подтверждения отправлен" };
   },
 
   login: async (data: LoginRequest): Promise<LoginResponse> => {

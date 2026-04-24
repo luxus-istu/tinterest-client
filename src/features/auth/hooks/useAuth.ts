@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import useAuthStore from "../store/auth.store"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { authApi } from "../api/auth.api";
-import { RegisterRequest, LoginRequest } from "../types";
+import { LoginRequest, RegisterRequest, ResendEmailOtpRequest, VerifyEmailOtpRequest } from "../types";
 
 export const useAuth = () => {
   const { user, isInitialized, setInitialized } = useAuthStore();
@@ -48,13 +48,30 @@ export const useAuthActions = () => {
     }
   })
 
+  const verifyEmailOtpMutation = useMutation({
+    mutationFn: (data: VerifyEmailOtpRequest) => authApi.verifyEmailOtp(data),
+  })
+
+  const resendEmailOtpMutation = useMutation({
+    mutationFn: (data: ResendEmailOtpRequest) => authApi.resendEmailOtp(data),
+  })
+
   return {
     register: registerMutation.mutateAsync,
+    verifyEmailOtp: verifyEmailOtpMutation.mutateAsync,
+    resendEmailOtp: resendEmailOtpMutation.mutateAsync,
     login: loginMutation.mutateAsync,
     logout: logoutMutation.mutateAsync,
     isRegistering: registerMutation.isPending,
+    isVerifyingEmailOtp: verifyEmailOtpMutation.isPending,
+    isResendingEmailOtp: resendEmailOtpMutation.isPending,
     isLogging: loginMutation.isPending,
     isLoggingOut: logoutMutation.isPending,
-    error: loginMutation.error || logoutMutation.error || registerMutation.error,
+    error:
+      loginMutation.error ||
+      logoutMutation.error ||
+      registerMutation.error ||
+      verifyEmailOtpMutation.error ||
+      resendEmailOtpMutation.error,
   }
 }
