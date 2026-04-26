@@ -4,9 +4,9 @@ import { Button, Card, FieldError, Form, Input, Label, TextField } from "@heroui
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { type SubmitHandler, useForm } from "react-hook-form";
 import { useAuthActions } from "@/src/features/auth/hooks/useAuth";
-import { LoginRequest } from "@/src/features/auth/types";
+import type { LoginRequest } from "@/src/features/auth/types";
 
 export function LoginPageView() {
   const { register, handleSubmit, formState: { errors } } = useForm<LoginRequest>();

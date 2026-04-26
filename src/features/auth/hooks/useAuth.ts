@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import useAuthStore from "../store/auth.store"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { authApi } from "../api/auth.api";
-import { LoginRequest, RegisterRequest, ResendEmailOtpRequest, VerifyEmailOtpRequest } from "../types";
+import type { LoginRequest, RegisterRequest, ResendEmailOtpRequest, VerifyEmailOtpRequest } from "../types";
 
 export const useAuth = () => {
   const { user, isInitialized, setInitialized } = useAuthStore();
