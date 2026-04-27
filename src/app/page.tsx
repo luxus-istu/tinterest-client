@@ -1,65 +1,47 @@
-import Image from 'next/image'
+"use client"
+
+import { Button } from '@heroui/react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
+  const router = useRouter()
+
   return (
-    <div className="flex flex-1 flex-col items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex w-full max-w-3xl flex-1 flex-col items-center justify-between bg-white px-16 py-32 sm:items-start dark:bg-black">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl leading-10 font-semibold tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{' '}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{' '}
-            or the{' '}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{' '}
-            center.
-          </p>
+    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden">
+      {/* Background blurred elements */}
+      <div className="absolute top-[10%] right-[-10%] h-52.5 w-52.5 rounded-full bg-[#FFDD00] opacity-70 blur-[120px]" />
+      <div className="absolute bottom-[-10%] left-[-20%] h-150 w-100 rounded-full bg-[#FFDD00] opacity-70 blur-[120px]" />
+
+      <div className="z-10 flex w-full max-w-100.5 flex-col items-center px-4 py-8">
+        {/* Logo and App Name */}
+        <div className="mb-4 flex items-center justify-center gap-3">
+          <img src={'/T-bank-logo.svg'} alt="logo" className="h-[52px] w-[52px]" />
+          <h1 className="text-5xl font-black leading-none tracking-tight">Tinterest</h1>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="bg-foreground text-background flex h-12 w-full items-center justify-center gap-2 rounded-full px-5 transition-colors hover:bg-[#383838] md:w-[158px] dark:hover:bg-[#ccc]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        {/* Subtitle */}
+        <h2 className="mb-24 text-center text-2xl font-extrabold leading-tight">
+          Новые знакомства на рабочем месте!
+        </h2>
+
+        {/* Actions */}
+        <div className="flex w-full flex-col items-center gap-6 font-semibold">
+          <Button
+            className="h-15 w-full max-w-81.5 text-lg"
+            onPress={() => router.push('/register')}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] md:w-[158px] dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            Зарегистрироваться
+          </Button>
+
+          <div className="flex flex-col items-center gap-1 text-lg">
+            <span className="text-[#c0c0c7] font-normal">Уже есть анкета?</span>
+            <Link href="/login" className="font-semibold">
+              Войти
+            </Link>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   )
 }
