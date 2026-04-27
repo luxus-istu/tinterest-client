@@ -2,6 +2,7 @@ import QueryProvider from '../providers/QueryProvider'
 import { Manrope } from "next/font/google"
 import "../styles/globals.css";
 import type { ReactNode } from 'react'
+import { Analytics } from '@vercel/analytics/next';
 import ThemeProvider from '../providers/ThemeProvider';
 
 const manrope = Manrope({
@@ -21,6 +22,7 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </QueryProvider>
+        <Analytics />
       </body>
     </html>
   )
