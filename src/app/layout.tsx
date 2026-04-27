@@ -1,6 +1,7 @@
 import { Manrope } from "next/font/google"
 import "../styles/globals.css";
 import type { ReactNode } from 'react'
+import { Analytics } from '@vercel/analytics/next';
 import QueryProvider from '../providers/QueryProvider';
 import ThemeProvider from '../providers/ThemeProvider';
 
@@ -21,6 +22,7 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </QueryProvider>
+        <Analytics />
       </body>
     </html>
   )
