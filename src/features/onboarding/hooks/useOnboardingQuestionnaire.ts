@@ -16,7 +16,7 @@ const getErrorMessage = (error: unknown) => {
   return 'Не удалось выполнить запрос. Проверьте данные и попробуйте снова.'
 }
 
-export function useOnboardingQuestionnaire() {
+export default function useOnboardingQuestionnaire() {
   const [step, setStep] = useState(0)
   const [errorMessage, setErrorMessage] = useState('')
   const [isCompleted, setIsCompleted] = useState(false)

@@ -8,7 +8,7 @@ import { BasicInfoStep } from '@/src/features/onboarding/components/steps/BasicI
 import { CommunicationStep } from '@/src/features/onboarding/components/steps/CommunicationStep'
 import { InterestsStep } from '@/src/features/onboarding/components/steps/InterestsStep'
 import { WorkStep } from '@/src/features/onboarding/components/steps/WorkStep'
-import { useOnboardingQuestionnaire } from '@/src/features/onboarding/hooks/useOnboardingQuestionnaire'
+import useOnboardingQuestionnaire from '@/src/features/onboarding/hooks/useOnboardingQuestionnaire'
 
 const stepsCount = stepTitles.length
 
