@@ -8,10 +8,10 @@ describe("auth otp schemas", () => {
   it("accepts valid otp payload", () => {
     const parsed = VerifyEmailOtpRequestSchema.parse({
       email: "test@test.com",
-      otp: "123456",
+      code: "123456",
     });
 
-    expect(parsed.otp).toBe("123456");
+    expect(parsed.code).toBe("123456");
   });
 
   it("rejects otp payload with wrong length", () => {

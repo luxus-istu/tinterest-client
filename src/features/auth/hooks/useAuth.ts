@@ -5,6 +5,7 @@ import useAuthStore from "../store/auth.store"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { authApi } from "../api/auth.api";
 import type { LoginRequest, RegisterRequest, ResendEmailOtpRequest, VerifyEmailOtpRequest } from "../types";
+import type { ErrorResponse } from "@/src/types";
 
 export const useAuth = () => {
   const { user, isInitialized, setInitialized } = useAuthStore();
@@ -68,10 +69,10 @@ export const useAuthActions = () => {
     isLogging: loginMutation.isPending,
     isLoggingOut: logoutMutation.isPending,
     error:
-      loginMutation.error ||
-      logoutMutation.error ||
-      registerMutation.error ||
-      verifyEmailOtpMutation.error ||
-      resendEmailOtpMutation.error,
+      (loginMutation.error as ErrorResponse | null) ||
+      (logoutMutation.error as ErrorResponse | null) ||
+      (registerMutation.error as ErrorResponse | null) ||
+      (verifyEmailOtpMutation.error as ErrorResponse | null) ||
+      (resendEmailOtpMutation.error as ErrorResponse | null),
   }
 }

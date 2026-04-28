@@ -6,7 +6,9 @@ export const RegisterRequestSchema = z.object({
   lastName: z.string().min(3).max(255),
   email: z.email(),
   password: z.string().min(8),
-  gender: z.enum(["male", "female"]),
+  gender: z.enum(["MALE", "FEMALE"]),
+  dateOfBirth: z.string(),
+  language: z.enum(["ru", "en"]),
 });
 
 export const RegisterResponseSchema = z.object({
@@ -16,7 +18,7 @@ export const RegisterResponseSchema = z.object({
 
 export const VerifyEmailOtpRequestSchema = z.object({
   email: z.email(),
-  otp: z.string().length(6),
+  code: z.string().length(6),
 });
 
 export const VerifyEmailOtpResponseSchema = z.object({

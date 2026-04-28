@@ -7,6 +7,7 @@ import { useState } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { useAuthActions } from "@/src/features/auth/hooks/useAuth";
 import type { LoginRequest } from "@/src/features/auth/types";
+import { ApiError } from "@/src/lib/api/error";
 
 export function LoginPageView() {
   const { register, handleSubmit, formState: { errors } } = useForm<LoginRequest>();
@@ -20,7 +21,7 @@ export function LoginPageView() {
       await login(data);
       router.push("/");
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Invalid account or password";
+      const message = err instanceof ApiError ? err.message : "Invalid account or password";
       setErrorMessage(message);
     }
   };
