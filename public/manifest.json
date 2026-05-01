@@ -1,0 +1,47 @@
+{
+  "name": "Tinterest — Знакомства в Т-Банке",
+  "short_name": "Tinterest",
+  "description": "Новые знакомства на рабочем месте! Tinterest помогает сотрудникам Т-Банка найти общий язык, дружить и строить отношения.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "fullscreen"],
+  "orientation": "portrait",
+  "theme_color": "#FFDD00",
+  "background_color": "#FFDD00",
+  "lang": "ru",
+  "categories": ["social", "lifestyle", "dating"],
+  "icons": [
+    { "src": "/favicon.ico", "type": "image/x-icon", "sizes": "16x16 32x32" },
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" },
+    {
+      "src": "/icon-192-maskable.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Войти",
+      "short_name": "Войти",
+      "description": "Быстрый вход в аккаунт",
+      "url": "/login",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Регистрация",
+      "short_name": "Регистрация",
+      "description": "Создать новую анкету",
+      "url": "/register",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
