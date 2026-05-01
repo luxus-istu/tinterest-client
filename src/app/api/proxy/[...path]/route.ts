@@ -31,6 +31,12 @@ async function proxy(
   });
   headers["host"] = "localhost:8443";
 
+  // Explicitly serialize cookies from NextRequest into the Cookie header
+  const cookieHeader = req.headers.get("cookie") || "";
+  if (cookieHeader) {
+    headers["cookie"] = cookieHeader;
+  }
+
   const body = ["POST", "PUT", "PATCH"].includes(req.method || "")
     ? await req.text()
     : undefined;
@@ -45,7 +51,27 @@ async function proxy(
 
   const responseHeaders = new Headers();
   Object.entries(res.headers).forEach(([key, value]) => {
-    if (HOP_BY_HOP.has(key.toLowerCase())) return;
+    const lowerKey = key.toLowerCase();
+    if (HOP_BY_HOP.has(lowerKey)) return;
+
+    if (lowerKey === "set-cookie") {
+      const cookies = Array.isArray(value) ? value : [value];
+      cookies.forEach((cookie) => {
+        // Rewrite cookie path so browser sends it on /api/proxy/* requests
+        let rewritten = cookie
+          .replace(/Path=\/v1\b/gi, "Path=/api/proxy")
+          .replace(/Path=\/v1\//gi, "Path=/api/proxy/");
+        // Strip Domain so cookie is scoped to the frontend host
+        rewritten = rewritten.replace(/Domain=[^;]+;?/gi, "");
+        // In development (HTTP localhost) strip Secure so browser stores the cookie
+        if (process.env.NODE_ENV === "development") {
+          rewritten = rewritten.replace(/Secure;?/gi, "");
+        }
+        responseHeaders.append(key, rewritten);
+      });
+      return;
+    }
+
     if (typeof value === "string") {
       responseHeaders.set(key, value);
     } else if (Array.isArray(value)) {
