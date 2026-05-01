@@ -1,30 +1,38 @@
 "use client";
 
-import { Button, Card, FieldError, Form, Input, Label, TextField } from "@heroui/react";
+import { Button, Card, CloseButton, FieldError, Form, Input, Label, TextField } from "@heroui/react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { useAuthActions } from "@/src/features/auth/hooks/useAuth";
+import { LoginRequestSchema } from "@/src/features/auth/types";
 import type { LoginRequest } from "@/src/features/auth/types";
-import { ApiError } from "@/src/lib/api/error";
+import { ApiError } from "@/src/lib/api";
 
 export function LoginPageView() {
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginRequest>();
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginRequest>({
+    resolver: zodResolver(LoginRequestSchema),
+  });
   const { login, isLogging } = useAuthActions();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
 
-  const onSubmit: SubmitHandler<LoginRequest> = async (data) => {
+  const onSubmit: SubmitHandler<LoginRequest> = useCallback(async (data) => {
     setErrorMessage(null);
     try {
       await login(data);
       router.push("/");
     } catch (err: unknown) {
-      const message = err instanceof ApiError ? err.message : "Invalid account or password";
+      const message = err instanceof ApiError
+        ? err.message
+        : err instanceof Error
+          ? err.message
+          : "Invalid account or password";
       setErrorMessage(message);
     }
-  };
+  }, [login, router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-2">
@@ -38,8 +46,12 @@ export function LoginPageView() {
         <Form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
           <Card.Content className="flex flex-col gap-4">
             {errorMessage && (
-              <div className="rounded-lg bg-danger/10 p-3 text-sm text-danger text-center">
+              <div className="relative rounded-lg bg-danger/10 p-3 pr-10 text-center text-sm text-danger">
                 {errorMessage}
+            <CloseButton
+              className="absolute right-2 top-1/2 -translate-y-1/2"
+              onPress={() => setErrorMessage(null)}
+            />
               </div>
             )}
 
@@ -48,7 +60,7 @@ export function LoginPageView() {
               <Input
                 placeholder="ivan@email.com"
                 variant="secondary"
-                {...register("email", { required: true, pattern: { value: /^\S+@\S+$/i, message: "Некорректная почта" } })}
+                {...register("email")}
               />
               <FieldError>{errors.email?.message}</FieldError>
             </TextField>
@@ -58,7 +70,7 @@ export function LoginPageView() {
               <Input
                 placeholder="••••••••"
                 variant="secondary"
-                {...register("password", { required: true, minLength: { value: 8, message: "Минимум 8 символов" } })}
+                {...register("password")}
               />
               <FieldError>{errors.password?.message}</FieldError>
             </TextField>
