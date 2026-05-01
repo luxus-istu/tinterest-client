@@ -1,19 +1,24 @@
 'use client'
 
-import { useEffect } from "react";
-import useAuthStore from "../store/auth.store"
-import { useMutation } from "@tanstack/react-query";
-import { authApi } from "../api/auth.api";
-import type { LoginRequest, RegisterRequest, ResendEmailOtpRequest, VerifyEmailOtpRequest } from "../types";
-import type { ErrorResponse } from "@/src/types";
+import { useEffect } from 'react'
+import useAuthStore from '../store/auth.store'
+import { useMutation } from '@tanstack/react-query'
+import { authApi } from '../api/auth.api'
+import type {
+  LoginRequest,
+  RegisterRequest,
+  ResendEmailOtpRequest,
+  VerifyEmailOtpRequest,
+} from '../types'
+import type { ErrorResponse } from '@/src/types'
 
 export const useAuth = () => {
-  const { user, isInitialized, clearAuth, setInitialized, setAccessToken } = useAuthStore();
+  const { user, clearAuth, setAccessToken, isRefreshing, setIsRefreshing } = useAuthStore()
 
   useEffect(() => {
-    if (isInitialized) return
-
-    authApi.refresh()
+    setIsRefreshing(true)
+    authApi
+      .refresh()
       .then((data) => {
         setAccessToken(data.accessToken)
       })
@@ -21,20 +26,19 @@ export const useAuth = () => {
         clearAuth()
       })
       .finally(() => {
-        setInitialized()
+        setIsRefreshing(false)
       })
-  }, [isInitialized, clearAuth, setInitialized, setAccessToken]);
+  }, [clearAuth, setAccessToken, setIsRefreshing])
 
   return {
-    isInitialized,
     user,
     isAuthenticated: !!user,
-    isLoading: !isInitialized
+    isLoading: !isRefreshing,
   }
 }
 
 export const useAuthActions = () => {
-  const { setAuth, clearAuth } = useAuthStore();
+  const { setAuth, clearAuth } = useAuthStore()
 
   const registerMutation = useMutation({
     mutationFn: (data: RegisterRequest) => authApi.register(data),
@@ -43,15 +47,15 @@ export const useAuthActions = () => {
   const loginMutation = useMutation({
     mutationFn: (data: LoginRequest) => authApi.login(data),
     onSuccess: (data) => {
-      setAuth(data.user, data.accessToken);
-    }
+      setAuth(data.user, data.accessToken)
+    },
   })
 
   const logoutMutation = useMutation({
     mutationFn: () => authApi.logout(),
     onSuccess: () => {
-      clearAuth();
-    }
+      clearAuth()
+    },
   })
 
   const verifyEmailOtpMutation = useMutation({

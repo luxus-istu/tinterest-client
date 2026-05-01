@@ -11,10 +11,8 @@ interface AuthState {
 interface AuthActions {
   setAuth: (user: User, accessToken: string) => void
   clearAuth: () => void
-  getAccessToken: () => string | null
   setAccessToken: (token: string) => void
   clearSession: () => void
-  getIsRefreshing: () => boolean
   setIsRefreshing: (value: boolean) => void
   subscribeRefresh: (callback: (token: string) => void) => void
   notifyRefresh: (token: string) => void
@@ -34,13 +32,10 @@ const useAuthStore = create<AuthStore>((set, get) => ({
 
   setAuth: (user, accessToken) => set({ user, accessToken }),
   clearAuth: () => set({ user: undefined, accessToken: undefined }),
-
-  getAccessToken: () => get().accessToken ?? null,
   setAccessToken: (token) => set({ accessToken: token }),
   clearSession: () => {
     set({ user: undefined, accessToken: undefined, isRefreshing: false, refreshSubscribers: [] })
   },
-  getIsRefreshing: () => get().isRefreshing,
   setIsRefreshing: (value) => {
     set({ isRefreshing: value })
   },
