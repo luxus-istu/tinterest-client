@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import useAuthStore from '../store/auth.store'
 import { useMutation } from '@tanstack/react-query'
 import { authApi } from '../api/auth.api'
@@ -13,10 +13,10 @@ import type {
 import type { ErrorResponse } from '@/src/types'
 
 export const useAuth = () => {
-  const { user, clearAuth, setAccessToken, isRefreshing, setIsRefreshing } = useAuthStore()
+  const { user, accessToken, clearAuth, setAccessToken } = useAuthStore()
+  const [checked, setChecked] = useState(false)
 
   useEffect(() => {
-    setIsRefreshing(true)
     authApi
       .refresh()
       .then((data) => {
@@ -26,14 +26,14 @@ export const useAuth = () => {
         clearAuth()
       })
       .finally(() => {
-        setIsRefreshing(false)
+        setChecked(true)
       })
-  }, [clearAuth, setAccessToken, setIsRefreshing])
+  }, [clearAuth, setAccessToken])
 
   return {
     user,
-    isAuthenticated: !!user,
-    isLoading: !isRefreshing,
+    isAuthenticated: !!accessToken || !!user,
+    isLoading: !checked,
   }
 }
 
