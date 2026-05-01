@@ -28,7 +28,7 @@ describe("authApi", () => {
       language: "ru",
     });
 
-    expect(mockedPost).toHaveBeenCalledWith("/v1/auth/register", expect.any(Object));
+    expect(mockedPost).toHaveBeenCalledWith("/auth/register", expect.any(Object));
     expect(response.email).toBe("test@test.com");
     expect(response.message.length).toBeGreaterThan(0);
   });
@@ -40,7 +40,7 @@ describe("authApi", () => {
       code: "123456",
     });
 
-    expect(mockedPost).toHaveBeenCalledWith("/v1/auth/verify-email", expect.any(Object));
+    expect(mockedPost).toHaveBeenCalledWith("/auth/email/verify", expect.any(Object));
     expect(response.message).toContain("подтвержд");
   });
 
@@ -60,7 +60,7 @@ describe("authApi", () => {
       email: "test@test.com",
     });
 
-    expect(mockedPost).toHaveBeenCalledWith("/v1/auth/resend-otp", expect.any(Object));
+    expect(mockedPost).toHaveBeenCalledWith("/auth/email/resend", expect.any(Object));
     expect(response.message).toContain("отправлен");
   });
 
@@ -68,32 +68,40 @@ describe("authApi", () => {
     mockedPost.mockResolvedValueOnce({
       data: {
         user: { id: 1, firstName: "Demo", lastName: "User", email: "demo@tinterest.ru", gender: "MALE" },
-        token: "mock-jwt-token",
+        accessToken: "mock-jwt-token",
       },
     });
     const response = await authApi.login({
-      account: "demo@tinterest.ru",
+      email: "demo@tinterest.ru",
       password: "password123",
     });
 
-    expect(mockedPost).toHaveBeenCalledWith("/v1/auth/login", expect.any(Object));
-    expect(response.token).toBe("mock-jwt-token");
+    expect(mockedPost).toHaveBeenCalledWith("/auth/login", expect.any(Object));
+    expect(response.accessToken).toBe("mock-jwt-token");
   });
 
   it("login fails for invalid credentials", async () => {
     mockedPost.mockRejectedValueOnce(new Error("Invalid credentials"));
     await expect(
       authApi.login({
-        account: "wrong@tinterest.ru",
+        email: "wrong@tinterest.ru",
         password: "wrong",
       })
     ).rejects.toThrow("Invalid credentials");
+  });
+
+  it("refresh calls correct endpoint", async () => {
+    mockedPost.mockResolvedValueOnce({ data: { accessToken: "new-mock-token" } });
+    const response = await authApi.refresh();
+
+    expect(mockedPost).toHaveBeenCalledWith("/auth/refresh");
+    expect(response.accessToken).toBe("new-mock-token");
   });
 
   it("logout calls correct endpoint", async () => {
     mockedPost.mockResolvedValueOnce({ data: undefined });
     await authApi.logout();
 
-    expect(mockedPost).toHaveBeenCalledWith("/v1/auth/logout");
+    expect(mockedPost).toHaveBeenCalledWith("/auth/logout");
   });
 });

@@ -27,6 +27,10 @@ export const authApi = {
     apiClient.post("/auth/login", data)
       .then((res) => res.data),
 
+  refresh: (): Promise<{ accessToken: string }> =>
+    apiClient.post("/auth/refresh")
+      .then((res) => res.data),
+
   logout: (): Promise<void> =>
     apiClient.post("/auth/logout")
       .then(() => undefined),

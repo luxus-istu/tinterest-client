@@ -1,50 +1,58 @@
-import { User } from "@/src/types";
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { User } from '@/src/types'
+import { create } from 'zustand'
 
 interface AuthState {
-  user?: User;
-  token?: string;
-  isInitialized: boolean;
+  user?: User
+  accessToken?: string
+  isRefreshing: boolean
+  refreshSubscribers: Array<(token: string) => void>
 }
 
 interface AuthActions {
-  setAuth: (user: User, token: string) => void;
-  clearAuth: () => void;
-  setInitialized: () => void;
+  setAuth: (user: User, accessToken: string) => void
+  clearAuth: () => void
+  getAccessToken: () => string | null
+  setAccessToken: (token: string) => void
+  clearSession: () => void
+  getIsRefreshing: () => boolean
+  setIsRefreshing: (value: boolean) => void
+  subscribeRefresh: (callback: (token: string) => void) => void
+  notifyRefresh: (token: string) => void
 }
 
-interface AuthStore extends AuthState, AuthActions { };
+interface AuthStore extends AuthState, AuthActions {}
 
 const initialState: AuthState = {
-  isInitialized: false,
-  token: undefined,
+  accessToken: undefined,
   user: undefined,
+  isRefreshing: false,
+  refreshSubscribers: [],
 }
 
-const useAuthStore = create<AuthStore>()(persist((set) => ({
+const useAuthStore = create<AuthStore>((set, get) => ({
   ...initialState,
-  setAuth: (user: User, token: string) => {
-    set({
-      user,
-      token,
-      isInitialized: true
-    })
-  },
-  clearAuth: () => {
-    set({
-      user: undefined,
-      token: undefined,
-      isInitialized: true
-    })
-  },
-  setInitialized: () => {
-    set({
-      isInitialized: true
-    })
-  }
-}), {
-  name: "tinterest-auth",
-}));
 
-export default useAuthStore;
+  setAuth: (user, accessToken) => set({ user, accessToken }),
+  clearAuth: () => set({ user: undefined, accessToken: undefined }),
+
+  getAccessToken: () => get().accessToken ?? null,
+  setAccessToken: (token) => set({ accessToken: token }),
+  clearSession: () => {
+    set({ user: undefined, accessToken: undefined, isRefreshing: false, refreshSubscribers: [] })
+  },
+  getIsRefreshing: () => get().isRefreshing,
+  setIsRefreshing: (value) => {
+    set({ isRefreshing: value })
+  },
+  subscribeRefresh: (callback) => {
+    const refreshSubscribers = get().refreshSubscribers
+    refreshSubscribers.push(callback)
+    set({ refreshSubscribers: refreshSubscribers })
+  },
+  notifyRefresh: (token) => {
+    get().refreshSubscribers.forEach((cb) => cb(token))
+    set({ refreshSubscribers: [] })
+  },
+}))
+
+export default useAuthStore
