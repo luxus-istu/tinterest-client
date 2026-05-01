@@ -5,7 +5,6 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
 
-  // TODO: Agree with the back office about storing photos
   images: {
     remotePatterns: [
       {
@@ -13,16 +12,7 @@ const nextConfig: NextConfig = {
         hostname: '**',
       },
     ],
-  },
-
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://localhost:8080/:path*',
-      },
-    ]
-  },
+  }
 }
 
 export default nextConfig
