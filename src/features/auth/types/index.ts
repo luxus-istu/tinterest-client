@@ -40,7 +40,7 @@ export const LoginRequestSchema = z.object({
 
 export const LoginResponseSchema = z.object({
   user: UserSchema,
-  token: z.string(),
+  accessToken: z.string(),
 });
 
 // Typescript types
