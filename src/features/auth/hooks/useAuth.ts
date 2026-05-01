@@ -2,20 +2,28 @@
 
 import { useEffect } from "react";
 import useAuthStore from "../store/auth.store"
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { authApi } from "../api/auth.api";
 import type { LoginRequest, RegisterRequest, ResendEmailOtpRequest, VerifyEmailOtpRequest } from "../types";
 import type { ErrorResponse } from "@/src/types";
 
 export const useAuth = () => {
-  const { user, isInitialized, setInitialized } = useAuthStore();
+  const { user, isInitialized, clearAuth, setInitialized, setAccessToken } = useAuthStore();
 
   useEffect(() => {
-    if (!isInitialized) {
-      setInitialized();
-    }
-  }, [isInitialized, setInitialized]);
+    if (isInitialized) return
 
+    authApi.refresh()
+      .then((data) => {
+        setAccessToken(data.accessToken)
+      })
+      .catch(() => {
+        clearAuth()
+      })
+      .finally(() => {
+        setInitialized()
+      })
+  }, [isInitialized, clearAuth, setInitialized, setAccessToken]);
 
   return {
     isInitialized,
@@ -26,7 +34,6 @@ export const useAuth = () => {
 }
 
 export const useAuthActions = () => {
-  const queryClient = useQueryClient();
   const { setAuth, clearAuth } = useAuthStore();
 
   const registerMutation = useMutation({
@@ -36,8 +43,7 @@ export const useAuthActions = () => {
   const loginMutation = useMutation({
     mutationFn: (data: LoginRequest) => authApi.login(data),
     onSuccess: (data) => {
-      setAuth(data.user, data.token);
-      queryClient.invalidateQueries({ queryKey: ['user'] })
+      setAuth(data.user, data.accessToken);
     }
   })
 
@@ -45,7 +51,6 @@ export const useAuthActions = () => {
     mutationFn: () => authApi.logout(),
     onSuccess: () => {
       clearAuth();
-      queryClient.invalidateQueries({ queryKey: ['user'] })
     }
   })
 
