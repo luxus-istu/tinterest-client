@@ -43,14 +43,14 @@ export function LoginPageView() {
               </div>
             )}
 
-            <TextField isRequired isInvalid={!!errors.account} name="account">
+            <TextField isRequired isInvalid={!!errors.email} name="email">
               <Label>Почта или логин</Label>
               <Input
                 placeholder="ivan@email.com"
                 variant="secondary"
-                {...register("account", { required: true, pattern: { value: /^\S+@\S+$/i, message: "Некорректная почта" } })}
+                {...register("email", { required: true, pattern: { value: /^\S+@\S+$/i, message: "Некорректная почта" } })}
               />
-              <FieldError>{errors.account?.message}</FieldError>
+              <FieldError>{errors.email?.message}</FieldError>
             </TextField>
 
             <TextField isRequired isInvalid={!!errors.password} name="password" type="password">

@@ -34,7 +34,7 @@ export const ResendEmailOtpResponseSchema = z.object({
 });
 
 export const LoginRequestSchema = z.object({
-  account: z.string().min(3),
+  email: z.string().min(3),
   password: z.string().min(8),
 });
 

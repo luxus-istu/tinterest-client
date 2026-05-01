@@ -36,7 +36,7 @@ describe("LoginPageView", () => {
 
     await waitFor(() => {
       expect(loginMock).toHaveBeenCalledWith({
-        account: "demo@tinterest.ru",
+        email: "demo@tinterest.ru",
         password: "password123",
       });
       expect(pushMock).toHaveBeenCalledWith("/");
