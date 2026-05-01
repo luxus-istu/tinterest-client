@@ -12,12 +12,22 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-vi.mock("@/src/features/auth/hooks/useAuth", () => ({
-  useAuthActions: () => ({
-    login: loginMock,
-    isLogging: false,
-  }),
-}));
+vi.mock("@/src/features/auth/hooks/useAuth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/src/features/auth/hooks/useAuth")>()
+  return {
+    ...actual,
+    useAuthActions: () => ({
+      login: loginMock,
+      isLogging: false,
+    }),
+    useAuth: () => ({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      error: null,
+    }),
+  }
+});
 
 describe("LoginPageView", () => {
   beforeEach(() => {
@@ -39,7 +49,7 @@ describe("LoginPageView", () => {
         email: "demo@tinterest.ru",
         password: "password123",
       });
-      expect(pushMock).toHaveBeenCalledWith("/");
+      expect(pushMock).toHaveBeenCalledWith("/search");
     });
   });
 
