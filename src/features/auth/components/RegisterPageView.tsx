@@ -1,15 +1,17 @@
 'use client'
 
-import { Card } from '@heroui/react'
+import { Card, Spinner } from '@heroui/react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import RegisterForm from './RegisterForm'
 import VerifyOtpForm from './VerifyOtpForm'
 import VerifiedConfirmation from './VerifiedConfirmation'
+import { useAuthGuard } from '../hooks/useAuthGuard'
 
 type RegisterStep = 'register' | 'verify' | 'verified'
 
 export default function RegisterPageView() {
+  const { isLoading } = useAuthGuard({ requireAuth: false, redirectTo: '/search' })
   const router = useRouter()
   const [step, setStep] = useState<RegisterStep>('register')
   const [registeredEmail, setRegisteredEmail] = useState<string>('')
@@ -66,6 +68,14 @@ export default function RegisterPageView() {
       </>
     )
   }, [step])
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Spinner size="lg" />
+      </div>
+    )
+  }
 
   return (
     <div className="bg-background flex min-h-screen items-center justify-center p-2">

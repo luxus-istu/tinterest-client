@@ -14,16 +14,26 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-vi.mock("@/src/features/auth/hooks/useAuth", () => ({
-  useAuthActions: () => ({
-    register: registerMock,
-    verifyEmailOtp: verifyEmailOtpMock,
-    resendEmailOtp: resendEmailOtpMock,
-    isRegistering: false,
-    isVerifyingEmailOtp: false,
-    isResendingEmailOtp: false,
-  }),
-}));
+vi.mock("@/src/features/auth/hooks/useAuth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/src/features/auth/hooks/useAuth")>()
+  return {
+    ...actual,
+    useAuthActions: () => ({
+      register: registerMock,
+      verifyEmailOtp: verifyEmailOtpMock,
+      resendEmailOtp: resendEmailOtpMock,
+      isRegistering: false,
+      isVerifyingEmailOtp: false,
+      isResendingEmailOtp: false,
+    }),
+    useAuth: () => ({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      error: null,
+    }),
+  }
+});
 
 describe("RegisterPageView", () => {
   beforeEach(() => {

@@ -15,12 +15,14 @@ export function useAuthGuard(options: UseAuthGuardOptions = {}) {
   const router = useRouter()
 
   useEffect(() => {
+    if (isLoading) return
+
     if (requireAuth && !isAuthenticated) {
       router.replace(redirectTo)
     } else if (!requireAuth && isAuthenticated) {
       router.replace(redirectTo)
     }
-  }, [isAuthenticated, requireAuth, redirectTo, router])
+  }, [isAuthenticated, isLoading, requireAuth, redirectTo, router])
 
-  return { isLoading: isLoading || isAuthenticated }
+  return { isLoading }
 }

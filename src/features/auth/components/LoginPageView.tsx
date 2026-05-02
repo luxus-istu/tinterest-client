@@ -1,17 +1,19 @@
 "use client";
 
-import { Button, Card, CloseButton, FieldError, Form, Input, Label, TextField } from "@heroui/react";
+import { Button, Card, CloseButton, FieldError, Form, Input, Label, Spinner, TextField } from "@heroui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { useAuthActions } from "@/src/features/auth/hooks/useAuth";
+import { useAuthGuard } from "@/src/features/auth/hooks/useAuthGuard";
 import { LoginRequestSchema } from "@/src/features/auth/types";
 import type { LoginRequest } from "@/src/features/auth/types";
 import { ApiError } from "@/src/lib/api";
 
 export function LoginPageView() {
+  const { isLoading } = useAuthGuard({ requireAuth: false, redirectTo: '/search' })
   const { register, handleSubmit, formState: { errors } } = useForm<LoginRequest>({
     resolver: zodResolver(LoginRequestSchema),
   });
@@ -23,7 +25,7 @@ export function LoginPageView() {
     setErrorMessage(null);
     try {
       await login(data);
-      router.push("/");
+      router.push("/search");
     } catch (err: unknown) {
       const message = err instanceof ApiError
         ? err.message
@@ -33,6 +35,14 @@ export function LoginPageView() {
       setErrorMessage(message);
     }
   }, [login, router]);
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Spinner size="lg" />
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-2">
