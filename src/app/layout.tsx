@@ -2,9 +2,9 @@ import "../styles/globals.css";
 import type { ReactNode } from 'react'
 import type { Metadata, Viewport } from 'next'
 import { Manrope } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next';
-import { SpeedInsights } from '@vercel/speed-insights/next';
-import QueryProvider from '../providers/QueryProvider';
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
+import QueryProvider from '../providers/QueryProvider'
 import ThemeProvider from '../providers/ThemeProvider';
 
 const manrope = Manrope({

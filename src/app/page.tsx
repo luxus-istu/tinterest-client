@@ -1,11 +1,21 @@
 "use client"
 
-import { Button } from '@heroui/react'
+import { Button, Spinner } from '@heroui/react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useAuthGuard } from '@/src/features/auth/hooks/useAuthGuard'
 
 export default function Home() {
+  const { isLoading } = useAuthGuard({ requireAuth: false, redirectTo: '/search' })
   const router = useRouter()
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    )
+  }
 
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden">
