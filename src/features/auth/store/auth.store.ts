@@ -10,6 +10,7 @@ interface AuthState {
 
 interface AuthActions {
   setAuth: (user: User, accessToken: string) => void
+  setUser: (user: User) => void
   clearAuth: () => void
   setAccessToken: (token: string) => void
   clearSession: () => void
@@ -31,6 +32,7 @@ const useAuthStore = create<AuthStore>((set, get) => ({
   ...initialState,
 
   setAuth: (user, accessToken) => set({ user, accessToken }),
+  setUser: (user) => set({ user }),
   clearAuth: () => set({ user: undefined, accessToken: undefined }),
   setAccessToken: (token) => set({ accessToken: token }),
   clearSession: () => {
