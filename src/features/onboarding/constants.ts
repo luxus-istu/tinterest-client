@@ -7,21 +7,15 @@ export const stepTitles = [
   'О себе',
 ] as const
 
-export const workFormats = ['OFFICE', 'REMOTE', 'HYBRID'] as const
-export const communicationFormats = ['OFFLINE', 'ONLINE', 'TEXT'] as const
+export const timeSlots = ['MORNING', 'AFTERNOON', 'EVENING', 'WEEKEND'] as const
 export const goals = ['NEW_FRIENDS', 'NETWORKING', 'RELATIONSHIP'] as const
 export const personalityTypes = ['INTROVERT', 'EXTROVERT', 'AMBIVERT'] as const
 
-export const workFormatLabels: Record<(typeof workFormats)[number], string> = {
-  OFFICE: 'Офис',
-  REMOTE: 'Удаленно',
-  HYBRID: 'Гибрид',
-}
-
-export const communicationFormatLabels: Record<(typeof communicationFormats)[number], string> = {
-  OFFLINE: 'Оффлайн',
-  ONLINE: 'Онлайн',
-  TEXT: 'Переписка',
+export const timeSlotLabels: Record<(typeof timeSlots)[number], string> = {
+  MORNING: 'Утро',
+  AFTERNOON: 'День',
+  EVENING: 'Вечер',
+  WEEKEND: 'Выходные',
 }
 
 export const goalLabels: Record<(typeof goals)[number], string> = {

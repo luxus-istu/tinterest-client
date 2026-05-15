@@ -1,14 +1,29 @@
-import z from 'zod'
-import {
-  basicInfoSchema,
-  communicationSchema,
-  completeSchema,
-  interestsSchema,
-  workSchema,
-} from '@/src/features/onboarding/types/schemas'
+export interface BasicInfoFormValues {
+  firstName: string
+  lastName: string
+  middleName?: string
+  dateOfBirth: string
+  gender: 'MALE' | 'FEMALE'
+  language: 'ru' | 'en'
+  city: string
+  about?: string
+}
 
-export type BasicInfoFormValues = z.infer<typeof basicInfoSchema>
-export type InterestsFormValues = z.infer<typeof interestsSchema>
-export type WorkFormValues = z.infer<typeof workSchema>
-export type CommunicationFormValues = z.infer<typeof communicationSchema>
-export type AboutFormValues = z.infer<typeof completeSchema>
+export interface InterestsFormValues {
+  interests: string[]
+}
+
+export interface WorkFormValues {
+  jobTitle: string
+  department: string
+}
+
+export interface CommunicationFormValues {
+  goal: string
+  personalityType: string
+  timeSlots: string[]
+}
+
+export interface AboutFormValues {
+  about?: string
+}
