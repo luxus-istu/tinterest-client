@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import useAuthStore from '../store/auth.store'
 import { useMutation } from '@tanstack/react-query'
 import { authApi } from '../api/auth.api'
+import { profileApi } from '../api/profile.api'
 import type {
   LoginRequest,
   RegisterRequest,
@@ -13,7 +14,7 @@ import type {
 import type { ErrorResponse } from '@/src/types'
 
 export const useAuth = () => {
-  const { user, accessToken, clearAuth, setAccessToken } = useAuthStore()
+  const { user, accessToken, clearAuth, setAccessToken, setUser } = useAuthStore()
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
@@ -21,6 +22,10 @@ export const useAuth = () => {
       .refresh()
       .then((data) => {
         setAccessToken(data.accessToken)
+        return profileApi.getMe()
+      })
+      .then((profile) => {
+        setUser(profile)
       })
       .catch(() => {
         clearAuth()
@@ -28,7 +33,7 @@ export const useAuth = () => {
       .finally(() => {
         setChecked(true)
       })
-  }, [clearAuth, setAccessToken])
+  }, [clearAuth, setAccessToken, setUser])
 
   return {
     user,
@@ -38,7 +43,8 @@ export const useAuth = () => {
 }
 
 export const useAuthActions = () => {
-  const { setAuth, clearAuth } = useAuthStore()
+  const { setAccessToken } = useAuthStore()
+  const { clearAuth } = useAuthStore()
 
   const registerMutation = useMutation({
     mutationFn: (data: RegisterRequest) => authApi.register(data),
@@ -47,7 +53,7 @@ export const useAuthActions = () => {
   const loginMutation = useMutation({
     mutationFn: (data: LoginRequest) => authApi.login(data),
     onSuccess: (data) => {
-      setAuth(data.user, data.accessToken)
+      setAccessToken(data.accessToken)
     },
   })
 
