@@ -1,4 +1,3 @@
-import { UserSchema } from "@/src/types";
 import z from "zod";
 
 export const RegisterRequestSchema = z.object({
@@ -39,11 +38,9 @@ export const LoginRequestSchema = z.object({
 });
 
 export const LoginResponseSchema = z.object({
-  user: UserSchema,
   accessToken: z.string(),
 });
 
-// Typescript types
 export type RegisterRequest = z.infer<typeof RegisterRequestSchema>;
 export type RegisterResponse = z.infer<typeof RegisterResponseSchema>;
 export type VerifyEmailOtpRequest = z.infer<typeof VerifyEmailOtpRequestSchema>;
