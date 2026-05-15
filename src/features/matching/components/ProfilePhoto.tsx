@@ -23,7 +23,7 @@ export const ProfilePhoto = memo(function ProfilePhoto({
       />
 
       {/* Gradient overlay at bottom */}
-      <div className="absolute right-0 bottom-0 left-0 z-10 h-44 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+      <div className="absolute right-0 bottom-0 left-0 z-10 h-44 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
 
       {/* Name + chips - top left */}
       <div className="absolute top-5 left-5 z-20 flex flex-col items-start gap-2">
