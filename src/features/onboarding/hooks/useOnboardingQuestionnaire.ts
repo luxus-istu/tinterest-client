@@ -1,12 +1,15 @@
 import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { onboardingService } from '@/src/features/onboarding/services/onboarding.service'
+import useAuthStore from '@/src/features/auth/store/auth.store'
 import type {
   AboutFormValues,
   BasicInfoFormValues,
   CommunicationFormValues,
   WorkFormValues,
 } from '@/src/features/onboarding/types/forms'
+import type { CompleteProfilePayload } from '@/src/features/onboarding/types'
+import OnboardingApi from '../api/onboarding.api'
 
 const getErrorMessage = (error: unknown) => {
   if (error instanceof Error && error.message) {
@@ -17,55 +20,56 @@ const getErrorMessage = (error: unknown) => {
 }
 
 export default function useOnboardingQuestionnaire() {
+  const router = useRouter()
+  const setUser = useAuthStore((s) => s.setUser)
   const [step, setStep] = useState(0)
   const [errorMessage, setErrorMessage] = useState('')
   const [isCompleted, setIsCompleted] = useState(false)
 
   const [basicValues, setBasicValues] = useState<BasicInfoFormValues>({
-    first_name: '',
-    last_name: '',
-    birth_date: '',
+    firstName: '',
+    lastName: '',
+    dateOfBirth: '',
+    gender: 'MALE',
+    language: 'ru',
+    city: '',
   })
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
-  const [selectedInterests, setSelectedInterests] = useState<number[]>([])
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([])
   const [workValues, setWorkValues] = useState<WorkFormValues>({
-    city: '',
-    job_title: '',
+    jobTitle: '',
     department: '',
-    work_format: 'OFFICE',
   })
   const [communicationValues, setCommunicationValues] = useState<CommunicationFormValues>({
     goal: 'NEW_FRIENDS',
-    communication_format: ['OFFLINE'],
+    personalityType: 'INTROVERT',
+    timeSlots: [],
   })
-  const [aboutValues, setAboutValues] = useState<AboutFormValues>({
-    about: '',
-    personality_type: 'INTROVERT',
-  })
+  const [aboutValues, setAboutValues] = useState<AboutFormValues>({})
 
   const interestsQuery = useQuery({
     queryKey: ['onboarding-interests'],
-    queryFn: onboardingService.getInterests,
+    queryFn: OnboardingApi.getInterests,
     enabled: step === 2,
   })
 
   const basicMutation = useMutation({
-    mutationFn: onboardingService.updateBasicProfile,
+    mutationFn: OnboardingApi.updateBasicProfile,
   })
   const avatarMutation = useMutation({
-    mutationFn: onboardingService.uploadAvatar,
+    mutationFn: OnboardingApi.uploadAvatar,
   })
   const interestsMutation = useMutation({
-    mutationFn: onboardingService.updateInterests,
+    mutationFn: OnboardingApi.updateInterests,
   })
   const workMutation = useMutation({
-    mutationFn: onboardingService.updateWork,
+    mutationFn: OnboardingApi.updateWork,
   })
   const communicationMutation = useMutation({
-    mutationFn: onboardingService.updateCommunication,
+    mutationFn: OnboardingApi.updateCommunication,
   })
   const completeMutation = useMutation({
-    mutationFn: onboardingService.completeProfile,
+    mutationFn: OnboardingApi.completeProfile,
   })
 
   const isSaving = useMemo(() => {
@@ -97,7 +101,8 @@ export default function useOnboardingQuestionnaire() {
     setBasicValues(values)
 
     try {
-      await basicMutation.mutateAsync(values)
+      const res = await basicMutation.mutateAsync(values)
+      console.log(res);
       setStep(1)
     } catch (error) {
       setErrorMessage(getErrorMessage(error))
@@ -118,12 +123,12 @@ export default function useOnboardingQuestionnaire() {
     }
   }
 
-  const submitInterests = async (interestIds: number[]) => {
+  const submitInterests = async (interestNames: string[]) => {
     setErrorMessage('')
-    setSelectedInterests(interestIds)
+    setSelectedInterests(interestNames)
 
     try {
-      await interestsMutation.mutateAsync({ interest_ids: interestIds })
+      await interestsMutation.mutateAsync({ interests: interestNames })
       setStep(3)
     } catch (error) {
       setErrorMessage(getErrorMessage(error))
@@ -158,9 +163,25 @@ export default function useOnboardingQuestionnaire() {
     setErrorMessage('')
     setAboutValues(values)
 
+    const payload: CompleteProfilePayload = {
+      city: basicValues.city,
+      about: values.about ?? '',
+      jobTitle: workValues.jobTitle,
+      department: workValues.department,
+      goal: communicationValues.goal,
+      personalityType: communicationValues.personalityType,
+      timeSlots: communicationValues.timeSlots,
+      interests: selectedInterests,
+    }
+
     try {
-      await completeMutation.mutateAsync(values)
+      await completeMutation.mutateAsync(payload)
+      const currentUser = useAuthStore.getState().user
+      if (currentUser) {
+        setUser({ ...currentUser, hasFilledProfile: true })
+      }
       setIsCompleted(true)
+      router.replace('/search')
     } catch (error) {
       setErrorMessage(getErrorMessage(error))
     }
