@@ -33,12 +33,16 @@ export const ProfilePhoto = memo(function ProfilePhoto({
           </span>
         </div>
         <div className="flex flex-wrap gap-1.5">
-          <Chip size="sm" className="bg-black/40 text-white backdrop-blur-md">
-            <Chip.Label>{profile.city}</Chip.Label>
-          </Chip>
-          <Chip size="sm" className="bg-black/40 text-white backdrop-blur-md">
-            <Chip.Label>{WORK_FORMAT_LABELS[profile.workFormat]}</Chip.Label>
-          </Chip>
+          {profile.city && (
+            <Chip size="sm" className="bg-black/40 text-white backdrop-blur-md">
+              <Chip.Label>{profile.city}</Chip.Label>
+            </Chip>
+          )}
+          {profile.workFormat && WORK_FORMAT_LABELS[profile.workFormat] && (
+            <Chip size="sm" className="bg-black/40 text-white backdrop-blur-md">
+              <Chip.Label>{WORK_FORMAT_LABELS[profile.workFormat]}</Chip.Label>
+            </Chip>
+          )}
         </div>
       </div>
 

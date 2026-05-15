@@ -32,10 +32,12 @@ export function ProfileDescription({ profile }: ProfileDescriptionProps) {
         <InfoRow label="Должность" value={profile.jobTitle} />
         <InfoRow label="Отдел" value={profile.department} />
         <InfoRow label="Город" value={profile.city} />
-        <InfoRow
-          label="Формат"
-          value={WORK_FORMAT_LABELS[profile.workFormat]}
-        />
+        {profile.workFormat && WORK_FORMAT_LABELS[profile.workFormat] && (
+          <InfoRow
+            label="Формат"
+            value={WORK_FORMAT_LABELS[profile.workFormat]}
+          />
+        )}
       </div>
 
       <div className="mb-4 space-y-1.5">
@@ -45,12 +47,15 @@ export function ProfileDescription({ profile }: ProfileDescriptionProps) {
           label="Тип"
           value={PERSONALITY_LABELS[profile.personalityType]}
         />
-        <InfoRow
-          label="Общение"
-          value={profile.communicationFormat
-            .map((f) => COMMUNICATION_FORMAT_LABELS[f])
-            .join(', ')}
-        />
+        {profile.communicationFormat.length > 0 && (
+          <InfoRow
+            label="Общение"
+            value={profile.communicationFormat
+              .map((f) => COMMUNICATION_FORMAT_LABELS[f])
+              .filter(Boolean)
+              .join(', ')}
+          />
+        )}
       </div>
 
       <div className="pb-6">
