@@ -3,15 +3,17 @@
 import { Checkbox, Form, Label, ListBox, Select } from '@heroui/react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import {
-  communicationFormatLabels,
-  communicationFormats,
   goalLabels,
   goals,
+  personalityTypeLabels,
+  personalityTypes,
+  timeSlotLabels,
+  timeSlots,
 } from '@/src/features/onboarding/constants'
 import type { CommunicationFormValues } from '@/src/features/onboarding/types/forms'
-import { communicationSchema } from '@/src/features/onboarding/types/schemas'
+import { CommunicationInfoSchema } from '@/src/features/onboarding/types/schemas'
 import { applyZodErrors } from '@/src/features/onboarding/utils/applyZodErrors'
-import { StepActions } from '@/src/features/onboarding/components/steps/StepActions'
+import StepActions from '@/src/features/onboarding/components/steps/StepActions'
 
 interface CommunicationStepProps {
   defaultValues: CommunicationFormValues
@@ -21,7 +23,7 @@ interface CommunicationStepProps {
   onSubmit: (values: CommunicationFormValues) => Promise<void>
 }
 
-export function CommunicationStep({
+export default function CommunicationStep({
   defaultValues,
   isSaving,
   errorMessage,
@@ -33,28 +35,25 @@ export function CommunicationStep({
       defaultValues,
     })
 
-  const selectedFormats = useWatch({
+  const selectedSlots = useWatch({
     control,
-    name: 'communication_format',
+    name: 'timeSlots',
   })
-  const safeSelectedFormats = selectedFormats ?? []
+  const safeSelectedSlots = selectedSlots ?? []
 
-  const toggleCommunicationFormat = (
-    format: CommunicationFormValues['communication_format'][number],
-    checked: boolean
-  ) => {
+  const toggleTimeSlot = (slot: string, checked: boolean) => {
     const nextValues = checked
-      ? [...safeSelectedFormats, format]
-      : safeSelectedFormats.filter((value) => value !== format)
+      ? [...safeSelectedSlots, slot]
+      : safeSelectedSlots.filter((value) => value !== slot)
 
-    setValue('communication_format', nextValues, {
+    setValue('timeSlots', nextValues, {
       shouldDirty: true,
       shouldValidate: true,
     })
   }
 
   const onValidSubmit = handleSubmit(async (values) => {
-    const result = communicationSchema.safeParse(values)
+    const result = CommunicationInfoSchema.safeParse(values)
     if (!result.success) {
       applyZodErrors(result, setError)
       return
@@ -88,22 +87,50 @@ export function CommunicationStep({
         )}
       />
 
+      <Controller
+        name="personalityType"
+        control={control}
+        render={({ field }) => (
+          <Select value={field.value} onChange={(value) => field.onChange(String(value))}>
+            <Label>Тип личности</Label>
+            <Select.Trigger>
+              <Select.Value />
+              <Select.Indicator />
+            </Select.Trigger>
+            <Select.Popover>
+              <ListBox>
+                {personalityTypes.map((personalityType) => (
+                  <ListBox.Item
+                    key={personalityType}
+                    id={personalityType}
+                    textValue={personalityType}
+                  >
+                    {personalityTypeLabels[personalityType]}
+                    <ListBox.ItemIndicator />
+                  </ListBox.Item>
+                ))}
+              </ListBox>
+            </Select.Popover>
+          </Select>
+        )}
+      />
+
       <div className="space-y-3">
-        <p className="text-sm text-muted">Предпочтительный формат общения</p>
-        <div className="grid gap-3 sm:grid-cols-3">
-          {communicationFormats.map((format) => {
-            const checked = safeSelectedFormats.includes(format)
+        <p className="text-sm text-muted">Предпочтительное время для общения</p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {timeSlots.map((slot) => {
+            const checked = safeSelectedSlots.includes(slot)
             return (
               <Checkbox
-                key={format}
+                key={slot}
                 isSelected={checked}
-                onChange={(isSelected) => toggleCommunicationFormat(format, isSelected)}
+                onChange={(isSelected) => toggleTimeSlot(slot, isSelected)}
               >
                 <Checkbox.Control>
                   <Checkbox.Indicator />
                 </Checkbox.Control>
                 <Checkbox.Content>
-                  <Label>{communicationFormatLabels[format]}</Label>
+                  <Label>{timeSlotLabels[slot]}</Label>
                 </Checkbox.Content>
               </Checkbox>
             )
@@ -112,8 +139,11 @@ export function CommunicationStep({
       </div>
 
       {formState.errors.goal?.message && <p className="text-sm text-danger">{formState.errors.goal.message}</p>}
-      {formState.errors.communication_format?.message && (
-        <p className="text-sm text-danger">{formState.errors.communication_format.message}</p>
+      {formState.errors.personalityType?.message && (
+        <p className="text-sm text-danger">{formState.errors.personalityType.message}</p>
+      )}
+      {formState.errors.timeSlots?.message && (
+        <p className="text-sm text-danger">{formState.errors.timeSlots.message}</p>
       )}
       {errorMessage && <p className="text-sm text-danger">{errorMessage}</p>}
 

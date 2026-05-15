@@ -4,21 +4,21 @@ import { Checkbox, Form, Label } from '@heroui/react'
 import type { UseQueryResult } from '@tanstack/react-query'
 import { useForm, useWatch } from 'react-hook-form'
 import type { InterestsFormValues } from '@/src/features/onboarding/types/forms'
-import { interestsSchema } from '@/src/features/onboarding/types/schemas'
-import type { Interest } from '@/src/features/onboarding/types/types'
+import { InterestsInfoSchema } from '@/src/features/onboarding/types/schemas'
+import type { Interest } from '@/src/features/onboarding/types'
 import { applyZodErrors } from '@/src/features/onboarding/utils/applyZodErrors'
-import { StepActions } from '@/src/features/onboarding/components/steps/StepActions'
+import StepActions from '@/src/features/onboarding/components/steps/StepActions'
 
 interface InterestsStepProps {
   interestsQuery: UseQueryResult<Interest[], Error>
-  defaultSelectedInterests: number[]
+  defaultSelectedInterests: string[]
   isSaving: boolean
   errorMessage: string
   onBack: () => void
-  onSubmit: (interestIds: number[]) => Promise<void>
+  onSubmit: (interestNames: string[]) => Promise<void>
 }
 
-export function InterestsStep({
+export default function InterestsStep({
   interestsQuery,
   defaultSelectedInterests,
   isSaving,
@@ -29,36 +29,36 @@ export function InterestsStep({
   const { handleSubmit, setValue, setError, clearErrors, formState, control } =
     useForm<InterestsFormValues>({
       defaultValues: {
-        interest_ids: defaultSelectedInterests,
+        interests: defaultSelectedInterests,
       },
     })
 
-  const selectedIds = useWatch({
+  const selectedInterests = useWatch({
     control,
-    name: 'interest_ids',
+    name: 'interests',
   })
 
-  const safeSelectedIds = selectedIds ?? []
+  const safeSelected = selectedInterests ?? []
 
-  const toggleInterest = (interestId: number, checked: boolean) => {
+  const toggleInterest = (interestName: string, checked: boolean) => {
     const nextValues = checked
-      ? Array.from(new Set([...safeSelectedIds, interestId]))
-      : safeSelectedIds.filter((id) => id !== interestId)
+      ? Array.from(new Set([...safeSelected, interestName]))
+      : safeSelected.filter((name) => name !== interestName)
 
     if (nextValues.length > 0) {
-      clearErrors('interest_ids')
+      clearErrors('interests')
     }
 
-    setValue('interest_ids', nextValues, { shouldValidate: true, shouldDirty: true })
+    setValue('interests', nextValues, { shouldValidate: true, shouldDirty: true })
   }
 
   const onValidSubmit = handleSubmit(async (values) => {
-    const result = interestsSchema.safeParse(values)
+    const result = InterestsInfoSchema.safeParse(values)
     if (!result.success) {
       applyZodErrors(result, setError)
       return
     }
-    await onSubmit(result.data.interest_ids)
+    await onSubmit(result.data.interests)
   })
 
   return (
@@ -71,13 +71,13 @@ export function InterestsStep({
 
       <div className="grid gap-3 sm:grid-cols-2">
         {interestsQuery.data?.map((interest) => {
-          const isSelected = safeSelectedIds.includes(interest.id)
+          const isSelected = safeSelected.includes(interest.name)
 
           return (
             <Checkbox
               key={interest.id}
               isSelected={isSelected}
-              onChange={(checked) => toggleInterest(interest.id, checked)}
+              onChange={(checked) => toggleInterest(interest.name, checked)}
             >
               <Checkbox.Control>
                 <Checkbox.Indicator />
@@ -90,8 +90,8 @@ export function InterestsStep({
         })}
       </div>
 
-      {formState.errors.interest_ids?.message && (
-        <p className="text-sm text-danger">{formState.errors.interest_ids.message}</p>
+      {formState.errors.interests?.message && (
+        <p className="text-sm text-danger">{formState.errors.interests.message}</p>
       )}
       {errorMessage && <p className="text-sm text-danger">{errorMessage}</p>}
 

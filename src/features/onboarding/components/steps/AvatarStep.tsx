@@ -2,7 +2,7 @@
 
 import { Form, Label, TextField } from '@heroui/react'
 import { useEffect, useState, type ChangeEvent } from 'react'
-import { StepActions } from '@/src/features/onboarding/components/steps/StepActions'
+import StepActions from '@/src/features/onboarding/components/steps/StepActions'
 
 interface AvatarStepProps {
   defaultFile: File | null
@@ -12,7 +12,7 @@ interface AvatarStepProps {
   onSubmit: (file: File | null) => Promise<void>
 }
 
-export function AvatarStep({
+export default function AvatarStep({
   defaultFile,
   isSaving,
   errorMessage,

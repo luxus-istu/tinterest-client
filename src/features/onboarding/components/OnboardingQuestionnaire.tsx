@@ -2,12 +2,12 @@
 
 import { stepTitles } from '@/src/features/onboarding/constants'
 import { CompletionState } from '@/src/features/onboarding/components/CompletionState'
-import { AboutStep } from '@/src/features/onboarding/components/steps/AboutStep'
-import { AvatarStep } from '@/src/features/onboarding/components/steps/AvatarStep'
-import { BasicInfoStep } from '@/src/features/onboarding/components/steps/BasicInfoStep'
-import { CommunicationStep } from '@/src/features/onboarding/components/steps/CommunicationStep'
-import { InterestsStep } from '@/src/features/onboarding/components/steps/InterestsStep'
-import { WorkStep } from '@/src/features/onboarding/components/steps/WorkStep'
+import AboutStep from '@/src/features/onboarding/components/steps/AboutStep'
+import AvatarStep from '@/src/features/onboarding/components/steps/AvatarStep'
+import BasicInfoStep from '@/src/features/onboarding/components/steps/BasicInfoStep'
+import CommunicationStep from '@/src/features/onboarding/components/steps/CommunicationStep'
+import InterestsStep from '@/src/features/onboarding/components/steps/InterestsStep'
+import WorkStep from '@/src/features/onboarding/components/steps/WorkStep'
 import useOnboardingQuestionnaire from '@/src/features/onboarding/hooks/useOnboardingQuestionnaire'
 
 const stepsCount = stepTitles.length
