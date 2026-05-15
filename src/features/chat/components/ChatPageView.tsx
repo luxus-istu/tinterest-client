@@ -1,14 +1,19 @@
 'use client'
 
-import { Button, Separator } from '@heroui/react'
+import { Button, Separator, Spinner } from '@heroui/react'
 import { Bell, Search } from 'lucide-react'
+import { useEffect } from 'react'
 import ChatList from './ChatList'
 import ChatConversation from './ChatConversation'
 import useChatStore from '../store/chat.store'
 
 export default function ChatPageView() {
-  const { selectedChatId } = useChatStore()
+  const { selectedChatId, loadChats, isLoadingChats, chatsError } = useChatStore()
   const isMobileChat = !!selectedChatId
+
+  useEffect(() => {
+    loadChats()
+  }, [loadChats])
 
   return (
     <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-4xl overflow-hidden bg-(--surface)">
@@ -34,7 +39,17 @@ export default function ChatPageView() {
             </div>
             <Separator className="mt-3" />
           </div>
-          <ChatList />
+          {isLoadingChats ? (
+            <div className="flex flex-1 items-center justify-center">
+              <Spinner size="lg" />
+            </div>
+          ) : chatsError ? (
+            <div className="flex flex-1 items-center justify-center px-4">
+              <p className="text-sm text-(--danger)">{chatsError}</p>
+            </div>
+          ) : (
+            <ChatList />
+          )}
         </div>
       </div>
 
@@ -54,7 +69,7 @@ export default function ChatPageView() {
                 Выберите чат
               </p>
               <p className="mt-1 text-sm text-(--muted)">
-                У вас пока нет активных диалогов
+                Выберите чат из списка, чтобы начать общение
               </p>
             </div>
           </div>

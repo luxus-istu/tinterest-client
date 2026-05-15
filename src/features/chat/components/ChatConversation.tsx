@@ -5,6 +5,17 @@ import { ArrowLeft } from 'lucide-react'
 import ChatMessage from './ChatMessage'
 import ChatInput from './ChatInput'
 import useChatStore from '../store/chat.store'
+import useAuthStore from '@/src/features/auth/store/auth.store'
+import type { ChatSummary, ChatMember } from '../types'
+
+function getOtherMember(chat: ChatSummary): ChatMember | undefined {
+  const me = useAuthStore.getState().user
+  return chat.members.find((m) => m.userId !== me?.id)
+}
+
+function fullName(member: ChatMember) {
+  return `${member.firstName} ${member.lastName}`
+}
 
 export default function ChatConversation() {
   const { chats, selectedChatId, goBack } = useChatStore()
@@ -13,6 +24,11 @@ export default function ChatConversation() {
 
   const chat = chats.find((c) => c.id === selectedChatId)
   if (!chat) return null
+
+  const isGroup = chat.type === 'GROUP'
+  const other = getOtherMember(chat)
+  const displayTitle = isGroup ? chat.title : (other ? fullName(other) : chat.title)
+  const avatarUrl = isGroup ? undefined : other?.avatarUrl
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -30,35 +46,23 @@ export default function ChatConversation() {
           <ArrowLeft size={20} />
         </Button>
         <div className="flex items-center gap-3">
-          {chat.isGroup ? (
+          {isGroup ? (
             <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-(--accent) text-sm font-bold text-(--accent-foreground)">
-              {chat.user.name.charAt(0)}
+              {displayTitle.charAt(0)}
             </div>
           ) : (
-            <div className="relative">
-              <img
-                alt={chat.user.name}
-                src={chat.user.avatar}
-                className="size-9 rounded-full object-cover"
-              />
-              <span className="absolute right-0 bottom-0 size-2.5 rounded-full bg-(--success) ring-2 ring-(--background)" />
-            </div>
+            <img
+              alt={displayTitle}
+              src={avatarUrl ?? ''}
+              className="size-9 rounded-full object-cover"
+            />
           )}
           <div>
             <p className="text-sm font-semibold text-(--foreground)">
-              {chat.user.name}
+              {displayTitle}
             </p>
-            <p className="flex items-center gap-1 text-xs text-(--muted)">
-              {chat.isGroup ? (
-                `${chat.onlineCount} в сети, ${chat.memberCount} участников`
-              ) : chat.user.isOnline ? (
-                <>
-                  <span className="size-1.5 rounded-full bg-(--success)" />
-                  В сети
-                </>
-              ) : (
-                'Не в сети'
-              )}
+            <p className="text-xs text-(--muted)">
+              {isGroup ? `${chat.members.length} участников` : ''}
             </p>
           </div>
         </div>
