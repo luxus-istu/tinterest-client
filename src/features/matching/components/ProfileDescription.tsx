@@ -23,9 +23,11 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 export function ProfileDescription({ profile }: ProfileDescriptionProps) {
   return (
     <div className="mx-auto mt-4 w-full max-w-md px-1">
-      <p className="mb-4 text-sm leading-relaxed text-foreground">
-        {profile.about}
-      </p>
+      {profile.about && (
+        <p className="mb-4 text-sm leading-relaxed text-foreground">
+          {profile.about}
+        </p>
+      )}
 
       <div className="mb-4 space-y-1.5">
         <h3 className="mb-2 text-sm font-semibold text-foreground">Работа</h3>

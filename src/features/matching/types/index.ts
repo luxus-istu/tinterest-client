@@ -37,7 +37,7 @@ export function mapUserCardToProfile(dto: UserCardDto): MatchingProfile {
     age,
     city: dto.city,
     avatarUrl: dto.avatarUrl,
-    about: dto.about,
+    about: dto.about ?? "",
     jobTitle: dto.jobTitle,
     department: dto.department,
     workFormat: "",

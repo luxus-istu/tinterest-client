@@ -13,7 +13,7 @@ export const UserCardDtoSchema = z.object({
   dateOfBirth: z.string(),
   gender: z.enum(["MALE", "FEMALE"]),
   city: z.string(),
-  about: z.string(),
+  about: z.string().nullable(),
   jobTitle: z.string(),
   department: z.string(),
   goal: z.string(),
