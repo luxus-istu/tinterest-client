@@ -1,4 +1,5 @@
-import { ErrorResponseSchema, type ErrorResponse } from "@/src/types";
+import type { ErrorResponse } from "@/src/types";
+import { ErrorResponseSchema } from "@/src/types/schemes";
 
 export class ApiError extends Error implements ErrorResponse {
   code: string;
