@@ -3,9 +3,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { profileApi } from "@/src/features/auth/api/profile.api";
 import useAuthStore from "@/src/features/auth/store/auth.store";
+import { useAuthActions } from "@/src/features/auth/hooks/useAuth";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Settings,
+  LogOut,
   MessageCircle,
   MapPin,
   Pencil,
@@ -27,7 +29,9 @@ function calculateAge(birthDateStr: string | undefined): number | null {
 }
 
 export function ProfileView() {
+  const router = useRouter();
   const storedUser = useAuthStore((s) => s.user);
+  const { logout, isLoggingOut } = useAuthActions();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["profile", "me"],
@@ -63,7 +67,12 @@ export function ProfileView() {
   const interests = (profile.interests || []).slice(0, 6);
 
   const getInterestName = (interest: string | { name: string }): string => {
-  return typeof interest === "string" ? interest : interest.name;
+    return typeof interest === "string" ? interest : interest.name;
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/login");
   };
 
   return (
@@ -71,9 +80,18 @@ export function ProfileView() {
       <div className="w-full max-w-screen-sm px-5">
         <header className="flex items-center justify-between pt-15">
           <h1 className="text-3xl font-bold text-white">Профиль</h1>
-          <Link href="/profile/settings">
-            <Settings className="h-12 stroke-white stroke-2" />
-          </Link>
+          <button
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="rounded-full p-2 transition-colors hover:bg-white/10"
+            aria-label="Выйти"
+          >
+            {isLoggingOut ? (
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            ) : (
+              <LogOut className="h-6 w-6 stroke-white stroke-2" />
+            )}
+          </button>
         </header>
 
         <section className="flex flex-col items-start justify-center pt-10">
@@ -175,7 +193,6 @@ export function ProfileView() {
                 </div>
               </CardContent>
 
-              {/* Optional footer for time slots */}
               {profile.timeSlots && profile.timeSlots.length > 0 && (
                 <CardFooter className="flex flex-col items-start gap-1.5 p-6 pt-0">
                   <h3 className="text-lg font-bold text-[#8E8E93]">Удобное время</h3>

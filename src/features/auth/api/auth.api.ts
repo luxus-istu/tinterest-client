@@ -30,8 +30,16 @@ export const authApi = {
   refresh: (): Promise<{ accessToken: string }> =>
     apiClient.post("/auth/refresh")
       .then((res) => res.data),
+  
+  logout: async (): Promise<void> => {
+    const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://localhost:8443';
+    const response = await fetch(`${baseURL}/v1/auth/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    });
 
-  logout: (): Promise<void> =>
-    apiClient.post("/auth/logout")
-      .then(() => undefined),
+    if (!response.ok && response.status !== 204) {
+      throw new Error(`Logout failed: ${response.status}`);
+    }
+  },
 }
