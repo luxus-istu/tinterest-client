@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { matchingApi } from "../api/matching.api"
+import matchingApi from "../api/matching.api"
 import { mapUserCardToProfile } from "../types"
 import type { MatchingProfile, MatchingFilter } from "../types"
 import type { RecommendationFiltersDto } from "../types/api"

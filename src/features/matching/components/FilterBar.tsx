@@ -10,7 +10,7 @@ interface FilterBarProps {
   onToggleFilter: (id: string) => void
 }
 
-export function FilterBar({
+export default function FilterBar({
   filters,
   activeFilters,
   showFilters,

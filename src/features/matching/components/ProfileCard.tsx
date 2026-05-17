@@ -1,9 +1,9 @@
 import { useRef } from 'react'
 import type { MatchingProfile } from '../types'
 import { useSwipe } from '../hooks/useSwipe'
-import { SwipeIndicator } from './SwipeIndicator'
-import { ProfilePhoto } from './ProfilePhoto'
-import { ProfileDescription } from './ProfileDescription'
+import SwipeIndicator from './SwipeIndicator'
+import ProfilePhoto from './ProfilePhoto'
+import ProfileDescription from './ProfileDescription'
 
 interface ProfileCardProps {
   profile: MatchingProfile
@@ -12,7 +12,7 @@ interface ProfileCardProps {
   onDislike: () => void
 }
 
-export function ProfileCard({
+export default function ProfileCard({
   profile,
   nextProfile,
   onLike,

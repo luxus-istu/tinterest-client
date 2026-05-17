@@ -4,13 +4,13 @@ import { Button } from '@heroui/react'
 import { Heart } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useInterestFilters, useRecommendations, useSwipeAction } from '../hooks/useMatching'
-import { FilterBar } from './FilterBar'
-import { ProfileCard } from './ProfileCard'
+import FilterBar from './FilterBar'
+import ProfileCard from './ProfileCard'
 import type { MatchingFilter } from '../types'
 
 const PREFETCH_THRESHOLD = 2
 
-export function MatchingPageView() {
+export default function MatchingPageView() {
   const {
     profiles,
     advance,

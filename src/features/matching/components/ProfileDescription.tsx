@@ -20,7 +20,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-export function ProfileDescription({ profile }: ProfileDescriptionProps) {
+export default function ProfileDescription({ profile }: ProfileDescriptionProps) {
   return (
     <div className="mx-auto mt-4 w-full max-w-md px-1">
       {profile.about && (

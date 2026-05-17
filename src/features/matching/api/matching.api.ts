@@ -10,16 +10,16 @@ import type {
 } from "../types/api"
 import { apiClient } from "@/src/lib/api/client"
 
-export const matchingApi = {
-  getRecommendations: (limit = 10) =>
+const matchingApi = {
+  getRecommendations: (limit: Number = 10) =>
     apiClient
       .get("/discovery/recommendation", { params: { limit } })
       .then((res) => RecommendationResponseSchema.parse(res.data)),
 
   getFilteredRecommendations: (
     filters: RecommendationFiltersDto,
-    page = 0,
-    limit = 10,
+    page: Number = 0,
+    limit: Number = 10,
   ) =>
     apiClient
       .get("/discovery/recommendation/filter", { params: { filters, page, limit } })
@@ -31,3 +31,5 @@ export const matchingApi = {
   getInterests: () =>
     apiClient.get("/interests").then((res) => InterestsArraySchema.parse(res.data)),
 }
+
+export default matchingApi;

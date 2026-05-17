@@ -10,7 +10,7 @@ interface ProfilePhotoProps {
   onDislike: () => void
 }
 
-export const ProfilePhoto = memo(function ProfilePhoto({
+const ProfilePhoto = memo(function ProfilePhoto({
   profile,
   onLike,
   onDislike,
@@ -80,3 +80,5 @@ export const ProfilePhoto = memo(function ProfilePhoto({
     </div>
   )
 })
+
+export default ProfilePhoto;

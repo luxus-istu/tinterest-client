@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useRef, useState, type PointerEvent } from 'react'
 import { SWIPE_THRESHOLD } from '../lib/labels'
 
 type SwipeDirection = 'like' | 'dislike'
@@ -59,7 +59,7 @@ export function useSwipe(onLike: () => void, onDislike: () => void) {
   )
 
   const handlePointerDown = useCallback(
-    (e: React.PointerEvent) => {
+    (e: PointerEvent) => {
       if (state.isAnimating) return
       e.currentTarget.setPointerCapture(e.pointerId)
       isHorizontalSwipe.current = false
@@ -71,7 +71,7 @@ export function useSwipe(onLike: () => void, onDislike: () => void) {
   )
 
   const handlePointerMove = useCallback(
-    (e: React.PointerEvent) => {
+    (e: PointerEvent) => {
       if (!state.isDragging) return
       currentPos.current = { x: e.clientX, y: e.clientY }
       const dx = currentPos.current.x - startPos.current.x

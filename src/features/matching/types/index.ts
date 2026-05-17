@@ -1,6 +1,5 @@
-import type { InterestDto, UserCardDto, RecommendationResponse, SwipeRequest, SwipeResponse, RecommendationFiltersDto } from "./api"
-
-export type { InterestDto, UserCardDto, RecommendationResponse, SwipeRequest, SwipeResponse, RecommendationFiltersDto }
+import type { UserCardDto } from "./api"
+export type * from "./api";
 
 export interface MatchingProfile {
   id: number

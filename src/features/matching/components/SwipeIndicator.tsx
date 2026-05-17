@@ -8,7 +8,7 @@ interface SwipeIndicatorProps {
 const indicatorTransition =
   'transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.27), opacity 0.2s ease'
 
-export function SwipeIndicator({ direction, side }: SwipeIndicatorProps) {
+export default function SwipeIndicator({ direction, side }: SwipeIndicatorProps) {
   const isActive = direction === side
   const color = side === 'like' ? LIKE_COLOR : DISLIKE_COLOR
   const label = side === 'like' ? 'LIKE' : 'NOPE'

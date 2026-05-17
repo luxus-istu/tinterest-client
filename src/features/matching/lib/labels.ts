@@ -21,6 +21,6 @@ export const COMMUNICATION_FORMAT_LABELS: Record<string, string> = {
   OFFLINE: 'Офлайн',
 }
 
-export const SWIPE_THRESHOLD = 100
-export const DISLIKE_COLOR = '#FF375F'
-export const LIKE_COLOR = '#30D158'
+export const SWIPE_THRESHOLD: Number = 100
+export const DISLIKE_COLOR: String = '#FF375F'
+export const LIKE_COLOR: String = '#30D158'
