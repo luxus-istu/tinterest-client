@@ -1,11 +1,20 @@
 import { Client, type IFrame, type IMessage, type StompSubscription } from '@stomp/stompjs'
 import useAuthStore from '@/src/features/auth/store/auth.store'
-import type { ChatMessage } from '../types'
+import type { ChatMessage, MessageSendRequest } from '../types'
 
-const WS_URL =
-  process.env.NODE_ENV === 'development'
-    ? 'wss://localhost:8443/ws'
-    : (process.env.NEXT_PUBLIC_WS_URL ?? 'wss://localhost:8443/ws')
+const DEFAULT_WS_PATH = '/ws'
+
+function resolveWsUrl() {
+  if (process.env.NEXT_PUBLIC_WS_URL) {
+    return process.env.NEXT_PUBLIC_WS_URL
+  }
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'https://localhost:8443'
+  const url = new URL(DEFAULT_WS_PATH, apiUrl)
+  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
+
+  return url.toString()
+}
 
 type MessageHandler = (message: ChatMessage) => void
 type ConnectionHandler = () => void
@@ -17,8 +26,8 @@ class WebSocketService {
   private connectHandlers = new Set<ConnectionHandler>()
   private disconnectHandlers = new Set<ConnectionHandler>()
   private errorHandlers = new Set<ErrorHandler>()
-  private subscription: StompSubscription | null = null
-  private reconnectTimer: ReturnType<typeof setTimeout> | null = null
+  private subscriptions = new Map<number, StompSubscription>()
+  private pendingChatIds = new Set<number>()
   private isManuallyDisconnected = false
 
   connect() {
@@ -30,7 +39,7 @@ class WebSocketService {
     this.isManuallyDisconnected = false
 
     this.client = new Client({
-      brokerURL: WS_URL,
+      brokerURL: resolveWsUrl(),
       connectHeaders: {
         Authorization: `Bearer ${token}`,
       },
@@ -43,11 +52,18 @@ class WebSocketService {
         }
       },
       onConnect: () => {
-        this.subscribeToMessages()
+        this.pendingChatIds.forEach((chatId) => this.subscribeToChat(chatId))
         this.connectHandlers.forEach((h) => h())
       },
       onDisconnect: () => {
+        this.subscriptions.clear()
         this.disconnectHandlers.forEach((h) => h())
+      },
+      onWebSocketClose: () => {
+        this.subscriptions.clear()
+        if (!this.isManuallyDisconnected) {
+          this.disconnectHandlers.forEach((h) => h())
+        }
       },
       onStompError: (frame: IFrame) => {
         const error = frame.headers['message'] ?? 'WebSocket error'
@@ -63,21 +79,24 @@ class WebSocketService {
 
   disconnect() {
     this.isManuallyDisconnected = true
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer)
-      this.reconnectTimer = null
-    }
-    this.subscription?.unsubscribe()
-    this.subscription = null
+    this.pendingChatIds.clear()
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe())
+    this.subscriptions.clear()
     this.client?.deactivate()
     this.client = null
   }
 
-  private subscribeToMessages() {
-    if (!this.client) return
+  subscribeToChats(chatIds: number[]) {
+    chatIds.forEach((chatId) => this.subscribeToChat(chatId))
+  }
 
-    this.subscription = this.client.subscribe(
-      '/user/queue/chat',
+  subscribeToChat(chatId: number) {
+    this.pendingChatIds.add(chatId)
+
+    if (!this.client?.connected || this.subscriptions.has(chatId)) return
+
+    const subscription = this.client.subscribe(
+      `/topic/chats/${chatId}`,
       (message: IMessage) => {
         try {
           const parsed: ChatMessage = JSON.parse(message.body)
@@ -87,13 +106,21 @@ class WebSocketService {
         }
       },
     )
+
+    this.subscriptions.set(chatId, subscription)
   }
 
-  sendViaWebSocket(chatId: number, content: string) {
-    this.client?.publish({
-      destination: '/app/chat.send',
-      body: JSON.stringify({ chatId, content, type: 'TEXT' }),
+  sendMessage(chatId: number, data: MessageSendRequest) {
+    if (!this.client?.connected) {
+      return false
+    }
+
+    this.client.publish({
+      destination: `/app/chats/${chatId}/messages`,
+      body: JSON.stringify(data),
     })
+
+    return true
   }
 
   onMessage(handler: MessageHandler) {

@@ -25,7 +25,22 @@ interface ChatActions {
   loadMoreMessages: (chatId: number) => Promise<void>
 }
 
-interface ChatStore extends ChatState, ChatActions {}
+interface ChatStore extends ChatState, ChatActions { }
+
+function appendMessage(
+  messages: Record<number, ChatMessage[]>,
+  message: ChatMessage,
+) {
+  const chatMessages = messages[message.chatId] ?? []
+  if (chatMessages.some((item) => item.id === message.id)) {
+    return messages
+  }
+
+  return {
+    ...messages,
+    [message.chatId]: [...chatMessages, message],
+  }
+}
 
 const useChatStore = create<ChatStore>((set, get) => ({
   chats: [],
@@ -46,6 +61,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
       set({ chats, isLoadingChats: false })
 
       wsService.connect()
+      wsService.subscribeToChats(chats.map((chat) => chat.id))
     } catch {
       set({ chatsError: 'Не удалось загрузить чаты', isLoadingChats: false })
     }
@@ -53,6 +69,8 @@ const useChatStore = create<ChatStore>((set, get) => ({
 
   selectChat: (chatId) => {
     set({ selectedChatId: chatId, isMobileList: false })
+    wsService.subscribeToChat(chatId)
+
     const { messages } = get()
     if (!messages[chatId] || messages[chatId].length === 0) {
       get().loadMessages(chatId)
@@ -67,16 +85,23 @@ const useChatStore = create<ChatStore>((set, get) => ({
 
     const content = text.trim()
     try {
+      const sentViaSocket = wsService.sendMessage(selectedChatId, {
+        type: 'TEXT',
+        content,
+      })
+
+      if (sentViaSocket) {
+        set({ messagesError: null })
+        return
+      }
+
       const newMessage = await chatApi.sendMessage(selectedChatId, {
         type: 'TEXT',
         content,
       })
 
       set({
-        messages: {
-          ...get().messages,
-          [selectedChatId]: [...(get().messages[selectedChatId] ?? []), newMessage],
-        },
+        messages: appendMessage(get().messages, newMessage),
         chats: chats.map((chat) =>
           chat.id === selectedChatId
             ? { ...chat, lastMessage: newMessage, unreadCount: 0 }
@@ -126,9 +151,15 @@ const useChatStore = create<ChatStore>((set, get) => ({
   },
 }))
 
+wsService.onConnect(() => {
+  const { chats } = useChatStore.getState()
+  wsService.subscribeToChats(chats.map((chat) => chat.id))
+})
+
 wsService.onMessage((message) => {
   const state = useChatStore.getState()
   const { chats, messages, selectedChatId } = state
+  const isKnownMessage = messages[message.chatId]?.some((item) => item.id === message.id) ?? false
 
   const updatedChats = chats.map((chat) => {
     if (chat.id === message.chatId) {
@@ -136,7 +167,7 @@ wsService.onMessage((message) => {
       return {
         ...chat,
         lastMessage: message,
-        unreadCount: isSelected ? 0 : chat.unreadCount + 1,
+        unreadCount: isSelected || isKnownMessage ? chat.unreadCount : chat.unreadCount + 1,
       }
     }
     return chat
@@ -144,9 +175,7 @@ wsService.onMessage((message) => {
 
   useChatStore.setState({
     chats: updatedChats,
-    messages: messages[message.chatId]
-      ? { ...messages, [message.chatId]: [...messages[message.chatId], message] }
-      : messages,
+    messages: appendMessage(messages, message),
   })
 })
 
