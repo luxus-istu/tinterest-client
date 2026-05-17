@@ -23,6 +23,7 @@ interface ChatActions {
   sendMessage: (text: string) => Promise<void>
   loadMessages: (chatId: number) => Promise<void>
   loadMoreMessages: (chatId: number) => Promise<void>
+  markChatAsRead: (chatId: number) => Promise<void>
 }
 
 interface ChatStore extends ChatState, ChatActions {}
@@ -59,6 +60,10 @@ function appendMessage(messages: Record<number, ChatMessage[]>, message: ChatMes
   }
 }
 
+function replaceChat(chats: ChatSummary[], updatedChat: ChatSummary) {
+  return chats.map((chat) => (chat.id === updatedChat.id ? updatedChat : chat))
+}
+
 const useChatStore = create<ChatStore>((set, get) => ({
   chats: [],
   messages: {},
@@ -85,8 +90,13 @@ const useChatStore = create<ChatStore>((set, get) => ({
   },
 
   selectChat: (chatId) => {
-    set({ selectedChatId: chatId, isMobileList: false })
+    set((state) => ({
+      selectedChatId: chatId,
+      isMobileList: false,
+      chats: state.chats.map((chat) => (chat.id === chatId ? { ...chat, unreadCount: 0 } : chat)),
+    }))
     wsService.subscribeToChat(chatId)
+    void get().markChatAsRead(chatId)
 
     const { messages } = get()
     if (!messages[chatId] || messages[chatId].length === 0) {
@@ -164,6 +174,15 @@ const useChatStore = create<ChatStore>((set, get) => ({
       // Silent fail for pagination
     }
   },
+
+  markChatAsRead: async (chatId) => {
+    try {
+      const updatedChat = await chatApi.markAsRead(chatId)
+      set({ chats: replaceChat(get().chats, updatedChat) })
+    } catch {
+      // Keep the optimistic unread state; the backend remains the source on next load.
+    }
+  },
 }))
 
 wsService.onConnect(() => {
@@ -182,7 +201,7 @@ wsService.onMessage((message) => {
       return {
         ...chat,
         lastMessage: message,
-        unreadCount: isSelected || isKnownMessage ? chat.unreadCount : chat.unreadCount + 1,
+        unreadCount: isSelected ? 0 : isKnownMessage ? chat.unreadCount : chat.unreadCount + 1,
       }
     }
     return chat
@@ -192,6 +211,10 @@ wsService.onMessage((message) => {
     chats: updatedChats,
     messages: appendMessage(messages, message),
   })
+
+  if (selectedChatId === message.chatId && !isKnownMessage) {
+    void useChatStore.getState().markChatAsRead(message.chatId)
+  }
 })
 
 export default useChatStore
