@@ -53,17 +53,15 @@ export default function ChatMessage() {
                   </p>
                 )}
                 <div
-                  className={`rounded-2xl px-4 py-2 text-sm ${
-                    isMe
-                      ? 'rounded-br-md bg-(--accent) text-(--accent-foreground)'
-                      : 'rounded-bl-md bg-(--surface-secondary) text-(--foreground)'
-                  }`}
+                  className={`rounded-2xl px-4 py-2 text-sm ${isMe
+                    ? 'rounded-br-md bg-(--accent) text-(--accent-foreground)'
+                    : 'rounded-bl-md bg-(--surface-secondary) text-(--foreground)'
+                    }`}
                 >
                   <p>{msg.content}</p>
                   <span
-                    className={`mt-0.5 block text-[10px] ${
-                      isMe ? 'text-(--accent-foreground)/60' : 'text-(--muted)'
-                    }`}
+                    className={`mt-0.5 block text-[10px] ${isMe ? 'text-(--accent-foreground)/60' : 'text-(--muted)'
+                      }`}
                   >
                     {formatTime(msg.createdAt)}
                   </span>

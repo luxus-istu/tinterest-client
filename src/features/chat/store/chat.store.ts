@@ -25,12 +25,29 @@ interface ChatActions {
   loadMoreMessages: (chatId: number) => Promise<void>
 }
 
-interface ChatStore extends ChatState, ChatActions { }
+interface ChatStore extends ChatState, ChatActions {}
 
-function appendMessage(
-  messages: Record<number, ChatMessage[]>,
-  message: ChatMessage,
-) {
+function sortMessagesByCreatedAt(messages: ChatMessage[]) {
+  return [...messages].sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  )
+}
+
+function mergeMessages(currentMessages: ChatMessage[], incomingMessages: ChatMessage[]) {
+  const byId = new Map<string, ChatMessage>()
+
+  for (const message of currentMessages) {
+    byId.set(message.id, message)
+  }
+
+  for (const message of incomingMessages) {
+    byId.set(message.id, message)
+  }
+
+  return sortMessagesByCreatedAt([...byId.values()])
+}
+
+function appendMessage(messages: Record<number, ChatMessage[]>, message: ChatMessage) {
   const chatMessages = messages[message.chatId] ?? []
   if (chatMessages.some((item) => item.id === message.id)) {
     return messages
@@ -38,7 +55,7 @@ function appendMessage(
 
   return {
     ...messages,
-    [message.chatId]: [...chatMessages, message],
+    [message.chatId]: mergeMessages(chatMessages, [message]),
   }
 }
 
@@ -103,9 +120,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
       set({
         messages: appendMessage(get().messages, newMessage),
         chats: chats.map((chat) =>
-          chat.id === selectedChatId
-            ? { ...chat, lastMessage: newMessage, unreadCount: 0 }
-            : chat,
+          chat.id === selectedChatId ? { ...chat, lastMessage: newMessage, unreadCount: 0 } : chat
         ),
       })
     } catch {
@@ -118,7 +133,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
     try {
       const page = await chatApi.getMessages(chatId, 0, 50)
       set({
-        messages: { ...get().messages, [chatId]: page.content },
+        messages: { ...get().messages, [chatId]: sortMessagesByCreatedAt(page.content) },
         totalMessages: { ...get().totalMessages, [chatId]: page.totalElements },
         hasMore: { ...get().hasMore, [chatId]: page.page < page.totalPages - 1 },
         isLoadingMessages: false,
@@ -140,7 +155,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
       set({
         messages: {
           ...get().messages,
-          [chatId]: [...page.content, ...existing],
+          [chatId]: mergeMessages(existing, page.content),
         },
         totalMessages: { ...get().totalMessages, [chatId]: page.totalElements },
         hasMore: { ...get().hasMore, [chatId]: page.page < page.totalPages - 1 },
