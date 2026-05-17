@@ -11,15 +11,15 @@ import type {
 import { apiClient } from "@/src/lib/api/client"
 
 const matchingApi = {
-  getRecommendations: (limit: Number = 10) =>
+  getRecommendations: (limit: number = 10) =>
     apiClient
       .get("/discovery/recommendation", { params: { limit } })
       .then((res) => RecommendationResponseSchema.parse(res.data)),
 
   getFilteredRecommendations: (
     filters: RecommendationFiltersDto,
-    page: Number = 0,
-    limit: Number = 10,
+    page: number = 0,
+    limit: number = 10,
   ) =>
     apiClient
       .get("/discovery/recommendation/filter", { params: { filters, page, limit } })
