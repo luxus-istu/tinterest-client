@@ -30,7 +30,10 @@ export default function ChatInput() {
   if (!selectedChatId) return null
 
   return (
-    <div className="border-separator flex shrink-0 items-center gap-2 border-t bg-surface px-4 py-3">
+    <div
+      className="border-separator flex shrink-0 items-center gap-2 border-t bg-surface px-4 py-3"
+      style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}
+    >
       <input
         ref={inputRef}
         type="text"

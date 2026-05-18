@@ -2,7 +2,7 @@
 
 import { Button, SearchField, Separator, Spinner } from '@heroui/react'
 import { Bell, Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import ChatList from './ChatList'
 import ChatConversation from './ChatConversation'
 import CreateGroupChatModal from './CreateGroupChatModal'
@@ -14,10 +14,38 @@ export default function ChatPageView() {
   const isMobileChat = !!selectedChatId
   const [searchQuery, setSearchQuery] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
+  const mobileRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     loadChats()
   }, [loadChats])
+
+  const syncVisualViewport = useCallback(() => {
+    const vv = window.visualViewport
+    if (!vv) return
+    const el = mobileRef.current
+    if (!el) return
+    const h = vv.height
+    el.style.height = `${h}px`
+    if (document.activeElement) {
+      const rect = document.activeElement.getBoundingClientRect()
+      if (rect.bottom > h) {
+        document.activeElement.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    const vv = window.visualViewport
+    if (!vv) return
+    vv.addEventListener('resize', syncVisualViewport)
+    vv.addEventListener('scroll', syncVisualViewport)
+    syncVisualViewport()
+    return () => {
+      vv.removeEventListener('resize', syncVisualViewport)
+      vv.removeEventListener('scroll', syncVisualViewport)
+    }
+  }, [syncVisualViewport])
 
   return (
     <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-surface">
@@ -82,7 +110,10 @@ export default function ChatPageView() {
       </div>
 
       {isMobileChat && (
-        <div className="fixed inset-0 z-40 flex flex-col bg-surface lg:hidden">
+        <div
+          ref={mobileRef}
+          className="fixed inset-x-0 top-0 z-[60] flex h-dvh flex-col bg-surface lg:hidden"
+        >
           <ChatConversation />
         </div>
       )}
