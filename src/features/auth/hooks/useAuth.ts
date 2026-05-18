@@ -14,7 +14,7 @@ import type {
 import type { ErrorResponse } from '@/src/types'
 
 export const useAuth = () => {
-  const { user, accessToken, clearAuth, setAccessToken, setUser } = useAuthStore()
+  const { user, accessToken, role, clearAuth, setAccessToken, setUser } = useAuthStore()
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
@@ -37,6 +37,7 @@ export const useAuth = () => {
 
   return {
     user,
+    role,
     isAuthenticated: !!accessToken || !!user,
     isLoading: !checked,
   }
