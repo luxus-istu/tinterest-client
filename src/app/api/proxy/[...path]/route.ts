@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import axios from 'axios'
 import https from 'https'
 
-const agent = new https.Agent({ rejectUnauthorized: false })
+const agent = new https.Agent({
+  rejectUnauthorized: process.env.NODE_ENV === 'development' ? false : true,
+})
 const backendBaseURL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:8443'
 const backendHost = new URL(backendBaseURL).host
 const PROTECTED_PATH_PREFIX = '/v1/'

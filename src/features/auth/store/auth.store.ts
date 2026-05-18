@@ -39,7 +39,9 @@ const useAuthStore = create<AuthStore>((set, get) => ({
     set({ user, accessToken, role: getRoleFromJwt(accessToken) }),
   setUser: (user) => set({ user }),
   setRole: (role) => set({ role }),
-  clearAuth: () => set({ user: undefined, accessToken: undefined, role: undefined }),
+  clearAuth: () => {
+    get().clearSession()
+  },
   setAccessToken: (token) =>
     set({ accessToken: token, role: getRoleFromJwt(token) }),
   clearSession: () => {
@@ -54,8 +56,15 @@ const useAuthStore = create<AuthStore>((set, get) => ({
     set({ refreshSubscribers: refreshSubscribers })
   },
   notifyRefresh: (token) => {
-    get().refreshSubscribers.forEach((cb) => cb(token))
+    const subscribers = get().refreshSubscribers
     set({ refreshSubscribers: [] })
+    for (const cb of subscribers) {
+      try {
+        cb(token)
+      } catch {
+        // Subscriber error must not prevent other subscribers from running.
+      }
+    }
   },
 }))
 
