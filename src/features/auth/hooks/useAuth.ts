@@ -38,7 +38,7 @@ export const useAuth = () => {
   return {
     user,
     role,
-    isAuthenticated: !!accessToken || !!user,
+    isAuthenticated: !!accessToken,
     isLoading: !checked,
   }
 }

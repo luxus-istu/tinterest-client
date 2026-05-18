@@ -14,8 +14,10 @@ export const apiClient = axios.create({
   withCredentials: true,
 })
 
+const AUTH_ENDPOINTS = new Set(['/auth/refresh', '/auth/login', '/auth/logout', '/auth/register', '/auth/email/verify', '/auth/email/resend'])
+
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  if (config.url === '/auth/refresh') {
+  if (config.url && AUTH_ENDPOINTS.has(config.url)) {
     return config
   }
 
@@ -36,7 +38,7 @@ apiClient.interceptors.response.use(
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean }
 
-      if (!originalRequest || originalRequest.url === '/auth/refresh') {
+      if (!originalRequest || originalRequest.url && AUTH_ENDPOINTS.has(originalRequest.url)) {
         useAuthStore.getState().clearSession()
         if (axios.isAxiosError(error) && error.response?.data) {
           return Promise.reject(parseErrorResponse(error.response.data))

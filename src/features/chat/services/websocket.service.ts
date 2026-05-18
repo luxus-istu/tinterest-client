@@ -29,6 +29,7 @@ class WebSocketService {
   private subscriptions = new Map<number, StompSubscription>()
   private pendingChatIds = new Set<number>()
   private isManuallyDisconnected = false
+  private unsubscribeToken: (() => void) | null = null
 
   connect() {
     if (this.client?.active) return
@@ -75,9 +76,17 @@ class WebSocketService {
     })
 
     this.client.activate()
+
+    this.unsubscribeToken = useAuthStore.subscribe((state, prev) => {
+      if (state.accessToken && state.accessToken !== prev.accessToken && this.client) {
+        this.client.connectHeaders = { Authorization: `Bearer ${state.accessToken}` }
+      }
+    })
   }
 
   disconnect() {
+    this.unsubscribeToken?.()
+    this.unsubscribeToken = null
     this.isManuallyDisconnected = true
     this.pendingChatIds.clear()
     this.subscriptions.forEach((subscription) => subscription.unsubscribe())

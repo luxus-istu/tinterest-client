@@ -15,7 +15,8 @@ interface UseAuthGuardOptions {
 
 export function useAuthGuard(options: UseAuthGuardOptions = {}) {
   const { requireAuth = true, requireProfile = true, requireRole, redirectTo } = options
-  const resolvedRedirect = redirectTo ?? (requireAuth ? '/login' : '/')
+  const effectiveRequireAuth = requireAuth || !!requireRole
+  const resolvedRedirect = redirectTo ?? (effectiveRequireAuth ? '/login' : '/')
   const { isAuthenticated, isLoading } = useAuth()
   const role = useAuthStore((s) => s.role)
   const user = useAuthStore((s) => s.user)
@@ -25,12 +26,12 @@ export function useAuthGuard(options: UseAuthGuardOptions = {}) {
   useEffect(() => {
     if (isLoading) return
 
-    if (requireAuth && !isAuthenticated) {
+    if (effectiveRequireAuth && !isAuthenticated) {
       router.replace(resolvedRedirect)
       return
     }
 
-    if (!requireAuth && isAuthenticated) {
+    if (!effectiveRequireAuth && isAuthenticated) {
       router.replace(resolvedRedirect)
       return
     }
@@ -40,10 +41,10 @@ export function useAuthGuard(options: UseAuthGuardOptions = {}) {
       return
     }
 
-    if (requireAuth && isAuthenticated && requireProfile && user && !user.hasFilledProfile) {
+    if (effectiveRequireAuth && isAuthenticated && requireProfile && user && !user.hasFilledProfile) {
       router.replace('/onboarding')
     }
-  }, [effectiveRole, isAuthenticated, isLoading, requireAuth, requireProfile, requireRole, resolvedRedirect, router, user])
+  }, [effectiveRole, isAuthenticated, isLoading, effectiveRequireAuth, requireProfile, requireRole, resolvedRedirect, router, user])
 
   return { isLoading }
 }
