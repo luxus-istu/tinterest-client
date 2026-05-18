@@ -5,11 +5,18 @@ import { LoginPageView } from "./LoginPageView";
 
 const pushMock = vi.fn();
 const loginMock = vi.fn();
+const getMeMock = vi.fn();
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: pushMock,
   }),
+}));
+
+vi.mock("@/src/features/auth/api/profile.api", () => ({
+  profileApi: {
+    getMe: () => getMeMock(),
+  },
 }));
 
 vi.mock("@/src/features/auth/hooks/useAuth", async (importOriginal) => {
@@ -33,10 +40,12 @@ describe("LoginPageView", () => {
   beforeEach(() => {
     pushMock.mockReset();
     loginMock.mockReset();
+    getMeMock.mockReset();
   });
 
   it("submits credentials and redirects on successful login", async () => {
     loginMock.mockResolvedValueOnce(undefined);
+    getMeMock.mockResolvedValueOnce({ hasFilledProfile: true });
 
     render(<LoginPageView />);
 
@@ -49,7 +58,7 @@ describe("LoginPageView", () => {
         email: "demo@tinterest.ru",
         password: "password123",
       });
-      expect(pushMock).toHaveBeenCalledWith("/search");
+      expect(pushMock).toHaveBeenCalledWith("/matching");
     });
   });
 

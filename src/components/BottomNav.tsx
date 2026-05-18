@@ -2,16 +2,11 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutGrid, MapPin, MessageCircle, User } from 'lucide-react'
+import { LayoutGrid, MessageCircle, User } from 'lucide-react'
 
 const navItems = [
   {
-    href: '/search',
-    label: 'Поиск',
-    icon: MapPin,
-  },
-  {
-    href: '/meetings',
+    href: '/matching',
     label: 'Встречи',
     icon: LayoutGrid,
   },
@@ -49,9 +44,8 @@ export default function BottomNav() {
                 className={isActive ? 'text-[#FFDD00]' : 'text-muted'}
               />
               <span
-                className={`text-[10px] leading-none font-medium ${
-                  isActive ? 'text-[#FFDD00]' : 'text-muted'
-                }`}
+                className={`text-[10px] leading-none font-medium ${isActive ? 'text-[#FFDD00]' : 'text-muted'
+                  }`}
               >
                 {item.label}
               </span>

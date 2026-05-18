@@ -11,21 +11,26 @@ import { useAuthGuard } from "@/src/features/auth/hooks/useAuthGuard";
 import { LoginRequestSchema } from "@/src/features/auth/types";
 import type { LoginRequest } from "@/src/features/auth/types";
 import { ApiError } from "@/src/lib/api";
+import { profileApi } from "@/src/features/auth/api/profile.api";
+import useAuthStore from "@/src/features/auth/store/auth.store";
 
 export function LoginPageView() {
-  const { isLoading } = useAuthGuard({ requireAuth: false, redirectTo: '/search' })
+  const { isLoading } = useAuthGuard({ requireAuth: false, redirectTo: '/matching' })
   const { register, handleSubmit, formState: { errors } } = useForm<LoginRequest>({
     resolver: zodResolver(LoginRequestSchema),
   });
   const { login, isLogging } = useAuthActions();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
+  const setUser = useAuthStore((s) => s.setUser);
 
   const onSubmit: SubmitHandler<LoginRequest> = useCallback(async (data) => {
     setErrorMessage(null);
     try {
       await login(data);
-      router.push("/search");
+      const profile = await profileApi.getMe();
+      setUser(profile);
+      router.push(profile.hasFilledProfile ? "/matching" : "/onboarding");
     } catch (err: unknown) {
       const message = err instanceof ApiError
         ? err.message
@@ -34,7 +39,7 @@ export function LoginPageView() {
           : "Invalid account or password";
       setErrorMessage(message);
     }
-  }, [login, router]);
+  }, [login, router, setUser]);
 
   if (isLoading) {
     return (
