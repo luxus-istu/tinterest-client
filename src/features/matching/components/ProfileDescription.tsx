@@ -44,10 +44,10 @@ export default function ProfileDescription({ profile }: ProfileDescriptionProps)
 
       <div className="mb-4 space-y-1.5">
         <h3 className="mb-2 text-sm font-semibold text-foreground">Предпочтения</h3>
-        <InfoRow label="Цель" value={GOAL_LABELS[profile.goal]} />
+        <InfoRow label="Цель" value={GOAL_LABELS[profile.goal] ?? profile.goal} />
         <InfoRow
           label="Тип"
-          value={PERSONALITY_LABELS[profile.personalityType]}
+          value={PERSONALITY_LABELS[profile.personalityType] ?? profile.personalityType}
         />
         {profile.communicationFormat.length > 0 && (
           <InfoRow

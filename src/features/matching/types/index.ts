@@ -25,25 +25,25 @@ export interface MatchingFilter {
 }
 
 export function mapUserCardToProfile(dto: UserCardDto): MatchingProfile {
-  const birth = new Date(dto.dateOfBirth)
-  const ageDiff = Date.now() - birth.getTime()
-  const age = Math.floor(ageDiff / (365.25 * 24 * 60 * 60 * 1000))
+  const birth = new Date(dto.dateOfBirth ?? "")
+  const ageDiff = isNaN(birth.getTime()) ? 0 : Date.now() - birth.getTime()
+  const age = ageDiff > 0 ? Math.floor(ageDiff / (365.25 * 24 * 60 * 60 * 1000)) : null
 
   return {
     id: dto.id,
     firstName: dto.firstName,
     lastName: dto.lastName,
     age,
-    city: dto.city,
-    avatarUrl: dto.avatarUrl,
+    city: dto.city ?? "",
+    avatarUrl: dto.avatarUrl ?? "",
     about: dto.about ?? "",
-    jobTitle: dto.jobTitle,
-    department: dto.department,
-    workFormat: "",
-    goal: dto.goal,
-    personalityType: dto.personalityType,
-    communicationFormat: [],
+    jobTitle: dto.jobTitle ?? "",
+    department: dto.department ?? "",
+    workFormat: dto.workFormat ?? "",
+    goal: dto.goal ?? "",
+    personalityType: dto.personalityType ?? "",
+    communicationFormat: dto.communicationFormat ?? [],
     interests: dto.interests.map((i) => ({ name: i.name })),
-    photos: [dto.avatarUrl],
+    photos: dto.avatarUrl ? [dto.avatarUrl] : [],
   }
 }

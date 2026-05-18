@@ -8,8 +8,6 @@ import FilterBar from './FilterBar'
 import ProfileCard from './ProfileCard'
 import type { MatchingFilter } from '../types'
 
-const PREFETCH_THRESHOLD = 2
-
 export default function MatchingPageView() {
   const {
     profiles,
@@ -17,7 +15,9 @@ export default function MatchingPageView() {
     isLoading,
     loadMore,
     needsMore,
+    error,
     setFilters,
+    refresh,
   } = useRecommendations()
   const [activeFilters, setActiveFilters] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(false)
@@ -37,12 +37,6 @@ export default function MatchingPageView() {
       loadMore()
     }
   }, [needsMore, isLoading, loadMore])
-
-  useEffect(() => {
-    if (profiles.length <= PREFETCH_THRESHOLD && !isLoading && !needsMore) {
-      loadMore()
-    }
-  }, [profiles.length, isLoading, needsMore, loadMore])
 
   const handleLike = useCallback(() => {
     const profile = profiles[0]
@@ -76,7 +70,8 @@ export default function MatchingPageView() {
   const resetAll = useCallback(() => {
     setActiveFilters([])
     setFilters({})
-  }, [setFilters])
+    refresh()
+  }, [setFilters, refresh])
 
   return (
     <div className="min-h-[calc(100vh-4rem)] overflow-x-hidden bg-background">
@@ -89,6 +84,16 @@ export default function MatchingPageView() {
       />
 
       <div className="px-4 pt-4">
+        {swipeMutation.isError && (
+          <div className="mb-3 rounded-xl bg-danger/10 px-4 py-2 text-sm text-danger">
+            Не удалось сохранить действие. Попробуйте позже.
+          </div>
+        )}
+        {error && (
+          <div className="mb-3 rounded-xl bg-danger/10 px-4 py-2 text-sm text-danger">
+            Не удалось загрузить анкеты. Попробуйте позже.
+          </div>
+        )}
         {isLoading && profiles.length === 0 ? (
           <div className="flex min-h-[50vh] items-center justify-center">
             <p className="text-muted">Загрузка...</p>

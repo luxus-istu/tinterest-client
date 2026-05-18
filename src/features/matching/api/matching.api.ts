@@ -22,7 +22,7 @@ const matchingApi = {
     limit: number = 10,
   ) =>
     apiClient
-      .get("/discovery/recommendation/filter", { params: { filters, page, limit } })
+      .get("/discovery/recommendation/filter", { params: { ...filters, page, limit } })
       .then((res) => FilteredRecommendationResponseSchema.parse(res.data)),
 
   swipe: (data: SwipeRequest) =>
