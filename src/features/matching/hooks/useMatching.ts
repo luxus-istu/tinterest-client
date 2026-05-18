@@ -56,6 +56,12 @@ export function useRecommendations() {
     setIndex((prev) => prev + count)
   }, [])
 
+  const refresh = useCallback(() => {
+    setPage(0)
+    setIndex(0)
+    setRefreshCounter((prev) => prev + 1)
+  }, [])
+
   return {
     profiles,
     advance,
@@ -66,6 +72,7 @@ export function useRecommendations() {
     needsMore,
     filters,
     setFilters,
+    refresh,
   }
 }
 

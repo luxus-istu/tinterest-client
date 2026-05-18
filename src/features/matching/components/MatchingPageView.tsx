@@ -17,6 +17,7 @@ export default function MatchingPageView() {
     needsMore,
     error,
     setFilters,
+    refresh,
   } = useRecommendations()
   const [activeFilters, setActiveFilters] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(false)
@@ -69,7 +70,8 @@ export default function MatchingPageView() {
   const resetAll = useCallback(() => {
     setActiveFilters([])
     setFilters({})
-  }, [setFilters])
+    refresh()
+  }, [setFilters, refresh])
 
   return (
     <div className="min-h-[calc(100vh-4rem)] overflow-x-hidden bg-background">
