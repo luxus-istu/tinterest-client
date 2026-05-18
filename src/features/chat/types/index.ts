@@ -25,6 +25,7 @@ export interface ChatSummary {
   id: number
   type: ChatType
   title: string
+  isPublic: boolean
   createdBy: number
   createdAt: string
   members: ChatMember[]
@@ -51,5 +52,24 @@ export interface DirectChatRequest {
 
 export interface GroupChatCreateRequest {
   title: string
+  isPublic: boolean
   memberIds: number[]
+}
+
+export interface UserSearchResult {
+  id: number
+  firstName: string
+  lastName: string
+  avatarUrl: string
+}
+
+export interface GroupChatUpdateRequest {
+  title?: string
+  isPublic?: boolean
+}
+
+export interface GroupChatPage {
+  content: ChatSummary[]
+  totalPages: number
+  totalElements: number
 }
