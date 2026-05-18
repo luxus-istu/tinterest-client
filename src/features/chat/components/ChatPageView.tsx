@@ -16,7 +16,7 @@ export default function ChatPageView() {
   }, [loadChats])
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-4xl overflow-hidden bg-(--surface)">
+    <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-(--surface)">
       <div
         className={`w-full shrink-0 overflow-hidden border-r border-(--separator) lg:block lg:w-80 ${
           selectedChatId ? 'hidden' : 'block'
