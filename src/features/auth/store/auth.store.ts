@@ -1,9 +1,11 @@
 import { User } from '@/src/types'
 import { create } from 'zustand'
+import { getRoleFromJwt, type AuthRole } from '../utils/jwt'
 
 interface AuthState {
   user?: User
   accessToken?: string
+  role?: AuthRole
   isRefreshing: boolean
   refreshSubscribers: Array<(token: string) => void>
 }
@@ -11,6 +13,7 @@ interface AuthState {
 interface AuthActions {
   setAuth: (user: User, accessToken: string) => void
   setUser: (user: User) => void
+  setRole: (role?: AuthRole) => void
   clearAuth: () => void
   setAccessToken: (token: string) => void
   clearSession: () => void
@@ -23,6 +26,7 @@ interface AuthStore extends AuthState, AuthActions {}
 
 const initialState: AuthState = {
   accessToken: undefined,
+  role: undefined,
   user: undefined,
   isRefreshing: false,
   refreshSubscribers: [],
@@ -31,12 +35,15 @@ const initialState: AuthState = {
 const useAuthStore = create<AuthStore>((set, get) => ({
   ...initialState,
 
-  setAuth: (user, accessToken) => set({ user, accessToken }),
+  setAuth: (user, accessToken) =>
+    set({ user, accessToken, role: getRoleFromJwt(accessToken) }),
   setUser: (user) => set({ user }),
-  clearAuth: () => set({ user: undefined, accessToken: undefined }),
-  setAccessToken: (token) => set({ accessToken: token }),
+  setRole: (role) => set({ role }),
+  clearAuth: () => set({ user: undefined, accessToken: undefined, role: undefined }),
+  setAccessToken: (token) =>
+    set({ accessToken: token, role: getRoleFromJwt(token) }),
   clearSession: () => {
-    set({ user: undefined, accessToken: undefined, isRefreshing: false, refreshSubscribers: [] })
+    set({ user: undefined, accessToken: undefined, role: undefined, isRefreshing: false, refreshSubscribers: [] })
   },
   setIsRefreshing: (value) => {
     set({ isRefreshing: value })
