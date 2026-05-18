@@ -6,6 +6,7 @@ import useAuthStore from "@/src/features/auth/store/auth.store";
 import { useProfileEdit } from "../hooks/useProfileEdit";
 import { profileEditApi } from "../api/edit.api";
 import { useForm, useWatch } from "react-hook-form";
+import { timeSlotLabels } from "@/src/features/onboarding/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   BasicInfoEditSchema,
@@ -40,11 +41,11 @@ import { useEffect, useState } from "react";
 import { SubmitHandler } from "react-hook-form";
 
 const TIME_SLOTS = [
-  'Утро',
-  'День',
-  'Вечер',
-  'Выходные',
-];
+  'MORNING',
+  'AFTERNOON',
+  'EVENING',
+  'WEEKEND',
+] as const;
 
 
 const GOAL_OPTIONS = [
@@ -437,7 +438,7 @@ export function EditView() {
                       <Checkbox.Indicator />
                     </Checkbox.Control>
                     <Checkbox.Content>
-                      <Label>{slot}</Label>
+                      <Label>{timeSlotLabels[slot] ?? slot}</Label>
                     </Checkbox.Content>
                   </Checkbox>
                 ))}

@@ -15,6 +15,7 @@ import {
   Clock,
 } from "lucide-react";
 import { Card, CardHeader, CardContent, CardFooter } from "@heroui/react";
+import { goalLabels, timeSlotLabels } from "@/src/features/onboarding/constants";
 
 function calculateAge(birthDateStr: string | undefined): number | null {
   if (!birthDateStr) return null;
@@ -70,6 +71,19 @@ export function ProfileView() {
     return typeof interest === "string" ? interest : interest.name;
   };
 
+  const getGoalLabel = (goal?: string | null): string => {
+    if (!goal) return "Не указана";
+    return goal in goalLabels
+      ? goalLabels[goal as keyof typeof goalLabels]
+      : goal;
+  };
+
+  const getTimeSlotLabel = (slot: string): string => {
+    return slot in timeSlotLabels
+      ? timeSlotLabels[slot as keyof typeof timeSlotLabels]
+      : slot;
+  };
+
   const handleLogout = async () => {
     await logout();
     router.push("/login");
@@ -109,7 +123,7 @@ export function ProfileView() {
               </p>
               <div className="flex w-fit items-center justify-center gap-2 rounded-full bg-[#2C2C2E] px-2 py-1.5">
                 <MessageCircle className="h-5 stroke-white stroke-2" />
-                <p className="text-white">{profile.goal || "Не указана"}</p>
+                <p className="text-white">{getGoalLabel(profile.goal)}</p>
               </div>
             </div>
           </div>
@@ -132,7 +146,7 @@ export function ProfileView() {
                       </p>
                       <div className="flex w-fit items-center justify-center gap-2 rounded-full bg-[#2C2C2E] px-2 py-1.5">
                         <MessageCircle className="h-5 stroke-white stroke-2" />
-                        <p className="text-white">{profile.goal || "Не указана"}</p>
+                        <p className="text-white">{getGoalLabel(profile.goal)}</p>
                       </div>
                       <div className="flex w-fit items-center justify-center gap-2 rounded-full bg-[#2C2C2E] px-2 py-1.5">
                         <MapPin className="h-5 stroke-white stroke-2" />
@@ -205,7 +219,7 @@ export function ProfileView() {
                         className="flex items-center gap-2 rounded-lg bg-[#2C2C2E] px-3 py-1.5"
                       >
                         <Clock className="h-4 stroke-white" />
-                        <span className="text-sm text-white">{slot}</span>
+                        <span className="text-sm text-white">{getTimeSlotLabel(slot)}</span>
                       </div>
                     ))}
                   </div>
