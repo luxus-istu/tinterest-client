@@ -1,8 +1,8 @@
 'use client'
 
-import { Button, Separator, Spinner } from '@heroui/react'
+import { Button, SearchField, Separator, Spinner } from '@heroui/react'
 import { Bell, Search } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import ChatList from './ChatList'
 import ChatConversation from './ChatConversation'
 import useChatStore from '../store/chat.store'
@@ -10,6 +10,8 @@ import useChatStore from '../store/chat.store'
 export default function ChatPageView() {
   const { selectedChatId, loadChats, isLoadingChats, chatsError } = useChatStore()
   const isMobileChat = !!selectedChatId
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchOpen, setSearchOpen] = useState(false)
 
   useEffect(() => {
     loadChats()
@@ -29,7 +31,15 @@ export default function ChatPageView() {
                 Чаты
               </h2>
               <div className="flex gap-1">
-                <Button isIconOnly size="sm" variant="ghost">
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant={searchOpen ? 'secondary' : 'ghost'}
+                  onPress={() => {
+                    setSearchOpen(!searchOpen)
+                    if (searchOpen) setSearchQuery('')
+                  }}
+                >
                   <Search size={20} />
                 </Button>
                 <Button isIconOnly size="sm" variant="ghost">
@@ -37,6 +47,19 @@ export default function ChatPageView() {
                 </Button>
               </div>
             </div>
+            {searchOpen && (
+              <SearchField
+                className="mt-3"
+                value={searchQuery}
+                onChange={setSearchQuery}
+              >
+                <SearchField.Group>
+                  <SearchField.SearchIcon />
+                  <SearchField.Input placeholder="Поиск..." />
+                  <SearchField.ClearButton />
+                </SearchField.Group>
+              </SearchField>
+            )}
             <Separator className="mt-3" />
           </div>
           {isLoadingChats ? (
@@ -48,7 +71,7 @@ export default function ChatPageView() {
               <p className="text-sm text-(--danger)">{chatsError}</p>
             </div>
           ) : (
-            <ChatList />
+            <ChatList searchQuery={searchQuery} />
           )}
         </div>
       </div>

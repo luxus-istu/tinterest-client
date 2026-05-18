@@ -14,14 +14,27 @@ function fullName(member: ChatMember) {
   return `${member.firstName} ${member.lastName}`
 }
 
-export default function ChatList() {
+export default function ChatList({ searchQuery }: { searchQuery: string }) {
   const { chats, selectedChatId, selectChat } = useChatStore()
 
-  const sorted = [...chats].sort(
-    (a, b) =>
-      new Date(b.lastMessage?.createdAt ?? b.createdAt).getTime() -
-      new Date(a.lastMessage?.createdAt ?? a.createdAt).getTime(),
-  )
+  const sorted = [...chats]
+    .filter((chat) => {
+      if (!searchQuery.trim()) return true
+      const q = searchQuery.toLowerCase()
+      const isGroup = chat.type === 'GROUP'
+      const other = getOtherMember(chat)
+      const title = isGroup
+        ? chat.title ?? ''
+        : other
+          ? fullName(other)
+          : chat.title ?? ''
+      return title.toLowerCase().includes(q)
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.lastMessage?.createdAt ?? b.createdAt).getTime() -
+        new Date(a.lastMessage?.createdAt ?? a.createdAt).getTime(),
+    )
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
