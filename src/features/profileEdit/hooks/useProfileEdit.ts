@@ -6,6 +6,25 @@ import { profileEditApi } from "../api/edit.api";
 import useAuthStore from "@/src/features/auth/store/auth.store";
 import { toast } from 'sonner';
 
+function getApiErrorMessage(error: unknown, fallback: string) {
+  if (typeof error !== "object" || error === null) return fallback;
+
+  if ("response" in error && typeof error.response === "object" && error.response !== null) {
+    const response = error.response as { data?: unknown };
+    if (
+      response.data &&
+      typeof response.data === "object" &&
+      response.data !== null &&
+      "message" in response.data &&
+      typeof (response.data as { message?: unknown }).message === "string"
+    ) {
+      return (response.data as { message: string }).message;
+    }
+  }
+
+  return fallback;
+}
+
 export function useProfileEdit() {
   const queryClient = useQueryClient();
   const setUser = useAuthStore((s) => s.setUser);
@@ -19,8 +38,8 @@ export function useProfileEdit() {
       toast.success("Основная информация обновлена");
       setErrorMessage(null);
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Ошибка обновления основной информации");
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, "Ошибка обновления основной информации"));
       setErrorMessage(null);
     },
   });
@@ -33,8 +52,8 @@ export function useProfileEdit() {
       toast.success('Информация о работе обновлена');
       setErrorMessage(null);
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Ошибка обновления работы");
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, "Ошибка обновления работы"));
       setErrorMessage(null);
     },
   });
@@ -47,8 +66,8 @@ export function useProfileEdit() {
       toast.success('Информация о коммуникации обновлена');
       setErrorMessage(null);
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Ошибка обновления целей общения");
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, "Ошибка обновления целей общения"));
       setErrorMessage(null);
     },
   });
@@ -61,8 +80,8 @@ export function useProfileEdit() {
       toast.success('Интересы обновлены');
       setErrorMessage(null);
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Ошибка обновления интересов");
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, "Ошибка обновления интересов"));
       setErrorMessage(null);
     },
   });
@@ -75,8 +94,8 @@ export function useProfileEdit() {
       toast.success('Аватар загружен');
       setErrorMessage(null);
     },
-    onError: (error: any) => {
-      toast.error(error?.response?.data?.message || "Ошибка загрузки аватара");
+    onError: (error: unknown) => {
+      toast.error(getApiErrorMessage(error, "Ошибка загрузки аватара"));
       setErrorMessage(null);
     },
   });

@@ -154,11 +154,26 @@ export function EditView() {
     });
   }, [profile, basicForm, workForm, communicationForm, interestsForm]);
 
-  const basicGender = basicForm.watch("gender");
-  const basicLanguage = basicForm.watch("language");
-  const communicationGoal = communicationForm.watch("goal");
-  const communicationPersonalityType = communicationForm.watch("personalityType");
-  const communicationTimeSlots = communicationForm.watch("timeSlots");
+  const basicGender = useWatch({
+    control: basicForm.control,
+    name: "gender",
+  });
+  const basicLanguage = useWatch({
+    control: basicForm.control,
+    name: "language",
+  });
+  const communicationGoal = useWatch({
+    control: communicationForm.control,
+    name: "goal",
+  });
+  const communicationPersonalityType = useWatch({
+    control: communicationForm.control,
+    name: "personalityType",
+  });
+  const communicationTimeSlots = useWatch({
+    control: communicationForm.control,
+    name: "timeSlots",
+  }) ?? [];
   const selectedInterests = useWatch({
     control: interestsForm.control,
     name: "interests",
