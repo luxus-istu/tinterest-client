@@ -11,7 +11,7 @@ import { useAuthGuard } from '../hooks/useAuthGuard'
 type RegisterStep = 'register' | 'verify' | 'verified'
 
 export default function RegisterPageView() {
-  const { isLoading } = useAuthGuard({ requireAuth: false, redirectTo: '/search' })
+  const { isLoading } = useAuthGuard({ requireAuth: false, redirectTo: '/matching' })
   const router = useRouter()
   const [step, setStep] = useState<RegisterStep>('register')
   const [registeredEmail, setRegisteredEmail] = useState<string>('')

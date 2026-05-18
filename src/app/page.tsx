@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useAuthGuard } from '@/src/features/auth/hooks/useAuthGuard'
 
 export default function Home() {
-  const { isLoading } = useAuthGuard({ requireAuth: false, redirectTo: '/search' })
+  const { isLoading } = useAuthGuard({ requireAuth: false, redirectTo: '/matching' })
   const router = useRouter()
 
   if (isLoading) {
