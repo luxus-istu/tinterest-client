@@ -181,7 +181,7 @@ export default function useOnboardingQuestionnaire() {
         setUser({ ...currentUser, hasFilledProfile: true })
       }
       setIsCompleted(true)
-      router.replace('/search')
+      router.replace('/matching')
     } catch (error) {
       setErrorMessage(getErrorMessage(error))
     }
