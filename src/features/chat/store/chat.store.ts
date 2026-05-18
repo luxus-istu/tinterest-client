@@ -8,6 +8,7 @@ interface ChatState {
   messages: Record<number, ChatMessage[]>
   totalMessages: Record<number, number>
   hasMore: Record<number, boolean>
+  currentPage: Record<number, number>
   selectedChatId: number | null
   isMobileList: boolean
   isLoadingChats: boolean
@@ -73,6 +74,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
   messages: {},
   totalMessages: {},
   hasMore: {},
+  currentPage: {},
   selectedChatId: null,
   isMobileList: true,
   isLoadingChats: false,
@@ -150,6 +152,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
         messages: { ...get().messages, [chatId]: sortMessagesByCreatedAt(page.content) },
         totalMessages: { ...get().totalMessages, [chatId]: page.totalElements },
         hasMore: { ...get().hasMore, [chatId]: page.page < page.totalPages - 1 },
+        currentPage: { ...get().currentPage, [chatId]: page.page },
         isLoadingMessages: false,
       })
     } catch {
@@ -158,14 +161,14 @@ const useChatStore = create<ChatStore>((set, get) => ({
   },
 
   loadMoreMessages: async (chatId) => {
-    const { messages, hasMore } = get()
+    const { messages, hasMore, currentPage } = get()
     if (!hasMore[chatId]) return
 
     const existing = messages[chatId] ?? []
-    const currentPage = Math.floor(existing.length / 50)
+    const nextPage = (currentPage[chatId] ?? 0) + 1
 
     try {
-      const page = await chatApi.getMessages(chatId, currentPage, 50)
+      const page = await chatApi.getMessages(chatId, nextPage, 50)
       set({
         messages: {
           ...get().messages,
@@ -173,6 +176,7 @@ const useChatStore = create<ChatStore>((set, get) => ({
         },
         totalMessages: { ...get().totalMessages, [chatId]: page.totalElements },
         hasMore: { ...get().hasMore, [chatId]: page.page < page.totalPages - 1 },
+        currentPage: { ...get().currentPage, [chatId]: page.page },
       })
     } catch {
       // Silent fail for pagination

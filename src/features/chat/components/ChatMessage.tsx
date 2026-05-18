@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
+import { Spinner } from '@heroui/react'
 import useChatStore from '../store/chat.store'
 import useAuthStore from '@/src/features/auth/store/auth.store'
 import type { ChatMember } from '../types'
@@ -14,8 +16,35 @@ function formatTime(iso: string) {
 }
 
 export default function ChatMessage() {
-  const { messages, selectedChatId, chats } = useChatStore()
+  const {
+    messages,
+    selectedChatId,
+    chats,
+    hasMore,
+    isLoadingMessages,
+    loadMoreMessages,
+  } = useChatStore()
   const me = useAuthStore((s) => s.user)
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!selectedChatId) return
+
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && hasMore[selectedChatId] && !isLoadingMessages) {
+          loadMoreMessages(selectedChatId)
+        }
+      },
+      { threshold: 0.1 }
+    )
+
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [selectedChatId, hasMore, isLoadingMessages, loadMoreMessages])
 
   if (!selectedChatId) return null
 
@@ -24,10 +53,16 @@ export default function ChatMessage() {
 
   const chatMessages = messages[selectedChatId] ?? []
   const isGroup = chat.type === 'GROUP'
+  const canLoadMore = hasMore[selectedChatId] ?? false
 
   return (
     <div className="flex flex-1 flex-col-reverse overflow-y-auto px-4 py-4">
       <div className="flex flex-col gap-3">
+        {canLoadMore && (
+          <div ref={sentinelRef} className="flex justify-center py-2">
+            {isLoadingMessages && <Spinner size="sm" />}
+          </div>
+        )}
         {chatMessages.map((msg) => {
           const isMe = msg.senderId === me?.id
           const sender = chat.members.find((m) => m.userId === msg.senderId)
