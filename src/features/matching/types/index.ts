@@ -25,7 +25,7 @@ export interface MatchingFilter {
 }
 
 export function mapUserCardToProfile(dto: UserCardDto): MatchingProfile {
-  const birth = new Date(dto.dateOfBirth)
+  const birth = new Date(dto.dateOfBirth ?? "")
   const ageDiff = isNaN(birth.getTime()) ? 0 : Date.now() - birth.getTime()
   const age = ageDiff > 0 ? Math.floor(ageDiff / (365.25 * 24 * 60 * 60 * 1000)) : null
 
