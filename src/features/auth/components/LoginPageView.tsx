@@ -15,7 +15,7 @@ import { profileApi } from "@/src/features/auth/api/profile.api";
 import useAuthStore from "@/src/features/auth/store/auth.store";
 
 export function LoginPageView() {
-  const { isLoading } = useAuthGuard({ requireAuth: false, redirectTo: '/search' })
+  const { isLoading } = useAuthGuard({ requireAuth: false, redirectTo: '/matching' })
   const { register, handleSubmit, formState: { errors } } = useForm<LoginRequest>({
     resolver: zodResolver(LoginRequestSchema),
   });
@@ -30,7 +30,7 @@ export function LoginPageView() {
       await login(data);
       const profile = await profileApi.getMe();
       setUser(profile);
-      router.push(profile.hasFilledProfile ? "/search" : "/onboarding");
+      router.push(profile.hasFilledProfile ? "/matching" : "/onboarding");
     } catch (err: unknown) {
       const message = err instanceof ApiError
         ? err.message

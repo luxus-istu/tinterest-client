@@ -10,6 +10,7 @@ const AUTH_PATHS = new Set([
   '/v1/auth/email/resend',
   '/v1/auth/email/verify',
   '/v1/auth/login',
+  '/v1/auth/logout',
   '/v1/auth/refresh',
   '/v1/auth/register',
 ])
@@ -141,7 +142,9 @@ async function proxy(req: NextRequest, { params }: { params: Promise<{ path: str
     }
   })
 
-  return new NextResponse(res.data, {
+  const responseBody: BodyInit | null = [204, 205].includes(res.status) ? null : (res.data as BodyInit)
+
+  return new NextResponse(responseBody, {
     status: res.status,
     statusText: res.statusText,
     headers: responseHeaders,

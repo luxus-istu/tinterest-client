@@ -6,6 +6,8 @@ import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import QueryProvider from '../providers/QueryProvider'
 import ThemeProvider from '../providers/ThemeProvider';
+import { Toaster } from 'sonner';
+
 
 const manrope = Manrope({
   subsets: ['cyrillic', 'latin'],
@@ -107,6 +109,7 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider>
             {children}
+            <Toaster position="top-center" richColors />
           </ThemeProvider>
         </QueryProvider>
         <Analytics />

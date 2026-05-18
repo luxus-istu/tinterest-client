@@ -1,184 +1,234 @@
-"use client"
+"use client";
 
-import { useQuery } from "@tanstack/react-query"
-import { profileApi } from "@/src/features/auth/api/profile.api"
-import { Card } from "@heroui/react"
-import Image from "next/image"
-import useAuthStore from "@/src/features/auth/store/auth.store"
-import { MapPin, Briefcase, Sparkles, Calendar, User } from "lucide-react"
+import { useQuery } from "@tanstack/react-query";
+import { profileApi } from "@/src/features/auth/api/profile.api";
+import useAuthStore from "@/src/features/auth/store/auth.store";
+import { useAuthActions } from "@/src/features/auth/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import {
+  LogOut,
+  MessageCircle,
+  MapPin,
+  Pencil,
+  User,
+  Clock,
+} from "lucide-react";
+import { Card, CardHeader, CardContent, CardFooter } from "@heroui/react";
+import { goalLabels, timeSlotLabels } from "@/src/features/onboarding/constants";
 
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("ru-RU", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })
+function calculateAge(birthDateStr: string | undefined): number | null {
+  if (!birthDateStr) return null;
+  const birthDate = new Date(birthDateStr);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
 }
 
-export default function ProfileView() {
-  const storedUser = useAuthStore((s) => s.user)
+export function ProfileView() {
+  const router = useRouter();
+  const storedUser = useAuthStore((s) => s.user);
+  const { logout, isLoggingOut } = useAuthActions();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["profile", "me"],
     queryFn: () => profileApi.getMe(),
     initialData: storedUser,
-  })
+  });
 
-  const profile = data
+  const profile = data;
 
   if (isLoading && !profile) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="h-32 w-32 animate-pulse rounded-full bg-(--surface-secondary)" />
-      </div>
-    )
+      <main className="px-5">
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-white">Загрузка...</div>
+        </div>
+      </main>
+    );
   }
 
   if (isError || !profile) {
     return (
-      <div className="flex h-full flex-col items-center justify-center px-6">
-        <User size={48} className="mb-4 text-(--muted)" strokeWidth={1.5} />
-        <p className="text-(--muted)">Не удалось загрузить профиль</p>
-      </div>
-    )
+      <main className="px-5">
+        <div className="flex min-h-screen flex-col items-center justify-center gap-4">
+          <User size={48} className="text-gray-400" strokeWidth={1.5} />
+          <p className="text-white">Не удалось загрузить профиль</p>
+        </div>
+      </main>
+    );
   }
 
+  const age = calculateAge(profile.dateOfBirth);
+  const ageString = age ? `${age} лет` : "возраст не указан";
+  const interests = profile.interests || [];
+
+  const getInterestName = (interest: string | { name: string }): string => {
+    return typeof interest === "string" ? interest : interest.name;
+  };
+
+  const getGoalLabel = (goal?: string | null): string => {
+    if (!goal) return "Не указана";
+    return goal in goalLabels
+      ? goalLabels[goal as keyof typeof goalLabels]
+      : goal;
+  };
+
+  const getTimeSlotLabel = (slot: string): string => {
+    return slot in timeSlotLabels
+      ? timeSlotLabels[slot as keyof typeof timeSlotLabels]
+      : slot;
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/login");
+  };
+
   return (
-    <div className="mx-auto w-full max-w-lg px-4 pt-4 pb-16">
-      <Card
-        className="overflow-hidden"
-        style={{
-          background: "var(--surface)",
-          borderColor: "var(--border)",
-          borderRadius: "24px",
-        }}
-      >
-        <div className="flex flex-col items-center px-6 pt-8">
-          <div className="relative mb-4">
-            {profile.avatarUrl ? (
-              <Image
-                src={profile.avatarUrl}
-                alt={`${profile.firstName} ${profile.lastName}`}
-                width={112}
-                height={112}
-                className="rounded-full object-cover ring-4 ring-(--accent)"
-              />
+    <main className="flex justify-center">
+      <div className="w-full max-w-screen-sm px-5">
+        <header className="flex items-center justify-between pt-15">
+          <h1 className="text-3xl font-bold text-white">Профиль</h1>
+          <button
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="rounded-full p-2 transition-colors hover:bg-white/10"
+            aria-label="Выйти"
+          >
+            {isLoggingOut ? (
+              <div className="h-6 w-6 animate-spin rounded-full border-2 border-white border-t-transparent" />
             ) : (
-              <div className="flex h-28 w-28 items-center justify-center rounded-full bg-(--surface-secondary) ring-4 ring-(--accent)">
-                <User size={40} className="text-(--muted)" />
-              </div>
+              <LogOut className="h-6 w-6 stroke-white stroke-2" />
             )}
-          </div>
+          </button>
+        </header>
 
-          <h1 className="text-2xl font-bold text-(--foreground)">
-            {profile.firstName} {profile.lastName}
-          </h1>
-          {profile.middleName && (
-            <p className="mt-0.5 text-sm text-(--muted)">{profile.middleName}</p>
-          )}
-        </div>
-
-        <div className="space-y-4 px-6 py-6">
-          {profile.city && (
-            <InfoRow icon={MapPin} label="Город" value={profile.city} />
-          )}
-          {profile.jobTitle && (
-            <InfoRow
-              icon={Briefcase}
-              label="Должность"
-              value={
-                profile.jobTitle +
-                (profile.department ? ` · ${profile.department}` : "")
-              }
+        <section className="flex flex-col items-start justify-center pt-10">
+          <div className="flex items-center justify-between gap-6">
+            <div
+              className="size-28 rounded-full bg-cover bg-center"
+              style={{ backgroundImage: `url('${profile.avatarUrl || ""}')` }}
             />
-          )}
-          {profile.goal && (
-            <InfoRow icon={Sparkles} label="Цель" value={profile.goal} />
-          )}
-          {profile.dateOfBirth && (
-            <InfoRow
-              icon={Calendar}
-              label="Дата рождения"
-              value={formatDate(profile.dateOfBirth)}
-            />
-          )}
-          {profile.personalityType && (
-            <div className="flex items-center gap-3 rounded-xl bg-(--surface-secondary) px-4 py-3">
-              <span className="text-xs font-medium text-(--muted)">Тип личности</span>
-              <span className="text-sm font-semibold text-(--foreground)">
-                {profile.personalityType}
-              </span>
+            <div className="flex flex-col gap-2">
+              <p className="text-xl font-bold text-white">
+                {profile.firstName || profile.lastName
+                  ? `${profile.firstName || ""} ${profile.lastName || ""}`
+                  : "username"}
+                <span>, {ageString}</span>
+              </p>
+              <div className="flex w-fit items-center justify-center gap-2 rounded-full bg-[#2C2C2E] px-2 py-1.5">
+                <MessageCircle className="h-5 stroke-white stroke-2" />
+                <p className="text-white">{getGoalLabel(profile.goal)}</p>
+              </div>
             </div>
-          )}
-        </div>
-
-        {profile.about && (
-          <div className="border-t border-(--border) px-6 py-4">
-            <h3 className="mb-2 text-xs font-medium uppercase tracking-wider text-(--muted)">
-              О себе
-            </h3>
-            <p className="text-sm leading-relaxed text-(--foreground)">
-              {profile.about}
-            </p>
           </div>
-        )}
 
-        {profile.interests && profile.interests.length > 0 && (
-          <div className="border-t border-(--border) px-6 py-4">
-            <h3 className="mb-2 text-xs font-medium uppercase tracking-wider text-(--muted)">
-              Интересы
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {profile.interests.map((interest, i) => (
-                <span
-                  key={typeof interest === "string" ? interest : i}
-                  className="rounded-full bg-(--surface-tertiary) px-3 py-1 text-xs font-medium text-(--surface-tertiary-foreground)"
+          <section className="mt-6 w-full pb-10">
+            <h2 className="mb-4 text-2xl font-bold text-white">Ваша анкета</h2>
+            <Card className="border-none bg-[#0A0A0A] shadow-lg shadow-white/5">
+              <CardHeader className="p-0">
+                <div
+                  className="aspect-4/6 w-full rounded-t-xl bg-cover bg-center p-6"
+                  style={{ backgroundImage: `url('${profile.avatarUrl || ""}')` }}
                 >
-                  {typeof interest === "string" ? interest : interest}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
+                  <div className="flex justify-between">
+                    <div className="flex flex-col gap-2">
+                      <p className="text-xl font-bold text-white">
+                        {profile.firstName || profile.lastName
+                          ? `${profile.firstName || ""} ${profile.lastName || ""}`
+                          : "username"}
+                        <span>, {ageString}</span>
+                      </p>
+                      <div className="flex w-fit items-center justify-center gap-2 rounded-full bg-[#2C2C2E] px-2 py-1.5">
+                        <MessageCircle className="h-5 stroke-white stroke-2" />
+                        <p className="text-white">{getGoalLabel(profile.goal)}</p>
+                      </div>
+                      <div className="flex w-fit items-center justify-center gap-2 rounded-full bg-[#2C2C2E] px-2 py-1.5">
+                        <MapPin className="h-5 stroke-white stroke-2" />
+                        <p className="text-white">{profile.city || "Город не указан"}</p>
+                      </div>
+                    </div>
+                    <Link href="/profile/edit">
+                      <Pencil className="h-9 stroke-white stroke-2" />
+                    </Link>
+                  </div>
+                </div>
+              </CardHeader>
 
-        {profile.timeSlots && profile.timeSlots.length > 0 && (
-          <div className="border-t border-(--border) px-6 py-4">
-            <h3 className="mb-2 text-xs font-medium uppercase tracking-wider text-(--muted)">
-              Удобное время
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {profile.timeSlots.map((slot) => (
-                <span
-                  key={slot}
-                  className="rounded-full bg-(--surface-secondary) px-3 py-1 text-xs font-medium text-(--surface-secondary-foreground)"
-                >
-                  {slot}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-      </Card>
-    </div>
-  )
-}
+              <CardContent className="flex flex-col gap-5 p-6">
+                <div className="flex flex-col gap-1.5">
+                  <h3 className="text-lg font-bold text-[#8E8E93]">Обо мне</h3>
+                  <div className="max-h-40 overflow-y-auto whitespace-pre-wrap wrap-break-word rounded-md pr-1">
+                    <p className="text-lg text-white">
+                      {profile.about || "Информация не указана"}
+                    </p>
+                  </div>
+                </div>
 
-function InfoRow({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: React.ComponentType<{ size: number; className: string }>
-  label: string
-  value: string
-}) {
-  return (
-    <div className="flex items-center gap-3 rounded-xl bg-(--surface-secondary) px-4 py-3">
-      <Icon size={18} className="text-(--muted) shrink-0" />
-      <div className="min-w-0">
-        <p className="text-xs font-medium text-(--muted)">{label}</p>
-        <p className="text-sm font-semibold text-(--foreground)">{value}</p>
+                <div className="flex flex-col gap-1.5">
+                  <h3 className="text-lg font-bold text-[#8E8E93]">Должность</h3>
+                  <p className="text-lg text-white">
+                    {profile.jobTitle || "Не указана"}
+                    {profile.department && ` · ${profile.department}`}
+                  </p>
+                </div>
+
+                {profile.personalityType && (
+                  <div className="flex flex-col gap-1.5">
+                    <h3 className="text-lg font-bold text-[#8E8E93]">Тип личности</h3>
+                    <p className="text-lg text-white">{profile.personalityType}</p>
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-1.5">
+                  <h3 className="text-lg font-bold text-[#8E8E93]">Меня интересует</h3>
+                  <div className="max-h-56 overflow-y-auto pr-1">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {interests.map((interest, idx) => (
+                      <div
+                        key={idx}
+                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#2C2C2E] px-2 py-1.5"
+                      >
+                        <span className="truncate text-sm text-white">
+                          {getInterestName(interest)}
+                        </span>
+                      </div>
+                    ))}
+                    {interests.length === 0 && (
+                      <p className="col-span-2 text-gray-400 sm:col-span-3">
+                        Интересы не указаны
+                      </p>
+                    )}
+                  </div>
+                </div>
+                </div>
+              </CardContent>
+
+              {profile.timeSlots && profile.timeSlots.length > 0 && (
+                <CardFooter className="flex flex-col items-start gap-1.5 p-6 pt-0">
+                  <h3 className="text-lg font-bold text-[#8E8E93]">Удобное время</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {profile.timeSlots.map((slot) => (
+                      <div
+                        key={slot}
+                        className="flex items-center gap-2 rounded-lg bg-[#2C2C2E] px-3 py-1.5"
+                      >
+                        <Clock className="h-4 stroke-white" />
+                        <span className="text-sm text-white">{getTimeSlotLabel(slot)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardFooter>
+              )}
+            </Card>
+          </section>
+        </section>
       </div>
-    </div>
-  )
+    </main>
+  );
 }

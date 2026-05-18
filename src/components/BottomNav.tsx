@@ -2,14 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutGrid, MapPin, MessageCircle, User } from 'lucide-react'
+import { LayoutGrid, MessageCircle, User } from 'lucide-react'
 
 const navItems = [
-  {
-    href: '/search',
-    label: 'Поиск',
-    icon: MapPin,
-  },
   {
     href: '/matching',
     label: 'Встречи',
