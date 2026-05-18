@@ -50,9 +50,8 @@ export default function ChatList({ searchQuery }: { searchQuery: string }) {
             key={chat.id}
             type="button"
             onClick={() => selectChat(chat.id)}
-            className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-(--surface-secondary) ${
-              isActive ? 'bg-(--surface-secondary)' : ''
-            }`}
+            className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-secondary ${isActive ? 'bg-surface-secondary' : ''
+              }`}
           >
             <div className="relative shrink-0">
               {isGroup ? (
@@ -84,22 +83,22 @@ export default function ChatList({ searchQuery }: { searchQuery: string }) {
                   {displayTitle}
                 </p>
                 {chat.unreadCount > 0 && (
-                  <span className="ml-2 flex size-5 shrink-0 items-center justify-center self-center rounded-full bg-(--accent) text-[10px] font-bold text-(--accent-foreground)">
+                  <span className="ml-2 flex size-5 shrink-0 items-center justify-center self-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">
                     {chat.unreadCount > 99 ? '99+' : chat.unreadCount}
                   </span>
                 )}
               </div>
-              <p className="mt-0.5 truncate text-xs text-(--muted)">
+              <p className="mt-0.5 truncate text-xs text-muted">
                 {chat.lastMessage?.content ?? 'Нет сообщений'}
               </p>
               {isGroup && (
-                <p className="mt-0.5 text-[10px] text-(--accent)">
+                <p className="mt-0.5 text-[10px] text-accent">
                   {chat.members.length} участников
                 </p>
               )}
             </div>
             {chat.lastMessage && (
-              <span className="self-center shrink-0 text-[11px] text-(--muted)">
+              <span className="self-center shrink-0 text-[11px] text-muted">
                 {formatTime(chat.lastMessage.createdAt)}
               </span>
             )}

@@ -47,7 +47,7 @@ export default function ChatConversation() {
         </Button>
         <div className="flex items-center gap-3">
           {isGroup ? (
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-(--accent) text-sm font-bold text-(--accent-foreground)">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-bold text-accent-foreground">
               {displayTitle.charAt(0)}
             </div>
           ) : (
@@ -61,7 +61,7 @@ export default function ChatConversation() {
             <p className="text-sm font-semibold text-(--foreground)">
               {displayTitle}
             </p>
-            <p className="text-xs text-(--muted)">
+            <p className="text-xs text-muted">
               {isGroup ? `${chat.members.length} участников` : ''}
             </p>
           </div>

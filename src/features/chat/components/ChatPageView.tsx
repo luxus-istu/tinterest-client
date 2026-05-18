@@ -18,11 +18,10 @@ export default function ChatPageView() {
   }, [loadChats])
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-(--surface)">
+    <div className="flex h-[calc(100vh-4rem)] overflow-hidden bg-surface">
       <div
-        className={`w-full shrink-0 overflow-hidden border-r border-(--separator) lg:block lg:w-80 ${
-          selectedChatId ? 'hidden' : 'block'
-        }`}
+        className={`w-full shrink-0 overflow-hidden border-r border-separator lg:block lg:w-80 ${selectedChatId ? 'hidden' : 'block'
+          }`}
       >
         <div className="flex h-full flex-col">
           <div className="shrink-0 px-4 pt-4">
@@ -68,7 +67,7 @@ export default function ChatPageView() {
             </div>
           ) : chatsError ? (
             <div className="flex flex-1 items-center justify-center px-4">
-              <p className="text-sm text-(--danger)">{chatsError}</p>
+              <p className="text-sm text-danger">{chatsError}</p>
             </div>
           ) : (
             <ChatList searchQuery={searchQuery} />
@@ -77,7 +76,7 @@ export default function ChatPageView() {
       </div>
 
       {isMobileChat && (
-        <div className="fixed inset-0 z-[51] flex flex-col bg-(--surface) lg:hidden">
+        <div className="fixed inset-0 z-51 flex flex-col bg-surface lg:hidden">
           <ChatConversation />
         </div>
       )}
@@ -91,7 +90,7 @@ export default function ChatPageView() {
               <p className="text-lg font-semibold text-(--foreground)">
                 Выберите чат
               </p>
-              <p className="mt-1 text-sm text-(--muted)">
+              <p className="mt-1 text-sm text-muted">
                 Выберите чат из списка, чтобы начать общение
               </p>
             </div>

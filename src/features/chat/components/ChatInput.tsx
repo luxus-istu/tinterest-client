@@ -30,7 +30,7 @@ export default function ChatInput() {
   if (!selectedChatId) return null
 
   return (
-    <div className="border-separator flex shrink-0 items-center gap-2 border-t bg-(--surface) px-4 py-3">
+    <div className="border-separator flex shrink-0 items-center gap-2 border-t bg-surface px-4 py-3">
       <input
         ref={inputRef}
         type="text"
@@ -38,7 +38,7 @@ export default function ChatInput() {
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Сообщение..."
-        className="w-full rounded-xl border-0 bg-(--surface-secondary) px-4 py-2.5 text-sm text-(--foreground) outline-none placeholder:text-(--muted)"
+        className="w-full rounded-xl border-0 bg-surface-secondary px-4 py-2.5 text-sm text-(--foreground) outline-none placeholder:text-muted"
       />
       <Button
         isIconOnly
