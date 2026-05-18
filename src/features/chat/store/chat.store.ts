@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { ChatSummary, ChatMessage } from '../types'
+import type { ChatSummary, ChatMessage, GroupChatUpdateRequest, GroupChatPage } from '../types'
 import { chatApi } from '../api/chat.api'
 import { wsService } from '../services/websocket.service'
 
@@ -24,6 +24,10 @@ interface ChatActions {
   loadMessages: (chatId: number) => Promise<void>
   loadMoreMessages: (chatId: number) => Promise<void>
   markChatAsRead: (chatId: number) => Promise<void>
+  createGroupChat: (title: string, isPublic: boolean, memberIds: number[]) => Promise<ChatSummary>
+  updateGroupChat: (chatId: number, data: GroupChatUpdateRequest) => Promise<ChatSummary>
+  joinGroup: (chatId: number) => Promise<ChatSummary>
+  discoverGroups: (page?: number) => Promise<GroupChatPage>
 }
 
 interface ChatStore extends ChatState, ChatActions {}
@@ -182,6 +186,30 @@ const useChatStore = create<ChatStore>((set, get) => ({
     } catch {
       // Keep the optimistic unread state; the backend remains the source on next load.
     }
+  },
+
+  createGroupChat: async (title, isPublic, memberIds) => {
+    const chat = await chatApi.createGroupChat({ title, isPublic, memberIds })
+    set((state) => ({ chats: [chat, ...state.chats] }))
+    wsService.subscribeToChat(chat.id)
+    return chat
+  },
+
+  updateGroupChat: async (chatId, data) => {
+    const updated = await chatApi.updateGroupChat(chatId, data)
+    set((state) => ({ chats: state.chats.map((c) => (c.id === chatId ? updated : c)) }))
+    return updated
+  },
+
+  joinGroup: async (chatId) => {
+    const chat = await chatApi.joinGroup(chatId)
+    set((state) => ({ chats: [chat, ...state.chats] }))
+    wsService.subscribeToChat(chat.id)
+    return chat
+  },
+
+  discoverGroups: async (page = 0) => {
+    return chatApi.discoverGroups(page)
   },
 }))
 
