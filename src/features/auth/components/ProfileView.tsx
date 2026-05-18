@@ -64,7 +64,7 @@ export function ProfileView() {
 
   const age = calculateAge(profile.dateOfBirth);
   const ageString = age ? `${age} лет` : "возраст не указан";
-  const interests = (profile.interests || []).slice(0, 6);
+  const interests = profile.interests || [];
 
   const getInterestName = (interest: string | { name: string }): string => {
     return typeof interest === "string" ? interest : interest.name;
@@ -173,6 +173,7 @@ export function ProfileView() {
 
                 <div className="flex flex-col gap-1.5">
                   <h3 className="text-lg font-bold text-[#8E8E93]">Меня интересует</h3>
+                  <div className="max-h-56 overflow-y-auto pr-1">
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                     {interests.map((interest, idx) => (
                       <div
@@ -190,6 +191,7 @@ export function ProfileView() {
                       </p>
                     )}
                   </div>
+                </div>
                 </div>
               </CardContent>
 
