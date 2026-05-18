@@ -58,7 +58,7 @@ describe("LoginPageView", () => {
         email: "demo@tinterest.ru",
         password: "password123",
       });
-      expect(pushMock).toHaveBeenCalledWith("/search");
+      expect(pushMock).toHaveBeenCalledWith("/matching");
     });
   });
 

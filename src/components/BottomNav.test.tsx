@@ -3,13 +3,12 @@ import { describe, expect, it, vi } from 'vitest'
 import BottomNav from './BottomNav'
 
 vi.mock('next/navigation', () => ({
-  usePathname: () => '/search',
+  usePathname: () => '/matching',
 }))
 
 describe('BottomNav', () => {
-  it('renders all 4 navigation links', () => {
+  it('renders all 3 navigation links', () => {
     render(<BottomNav />)
-    expect(screen.getByText('Поиск')).toBeInTheDocument()
     expect(screen.getByText('Встречи')).toBeInTheDocument()
     expect(screen.getByText('Чаты')).toBeInTheDocument()
     expect(screen.getByText('Профиль')).toBeInTheDocument()
@@ -18,9 +17,8 @@ describe('BottomNav', () => {
   it('links point to correct hrefs', () => {
     render(<BottomNav />)
     const links = screen.getAllByRole('link')
-    expect(links).toHaveLength(4)
-    expect(links[0]).toHaveAttribute('href', '/search')
-    expect(links[1]).toHaveAttribute('href', '/meetings')
+    expect(links).toHaveLength(3)
+    expect(links[0]).toHaveAttribute('href', '/matching')
     expect(links[2]).toHaveAttribute('href', '/chats')
     expect(links[3]).toHaveAttribute('href', '/profile')
   })
