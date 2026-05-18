@@ -5,6 +5,8 @@ import { Bell, Search } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import ChatList from './ChatList'
 import ChatConversation from './ChatConversation'
+import CreateGroupChatModal from './CreateGroupChatModal'
+import DiscoverGroupsModal from './DiscoverGroupsModal'
 import useChatStore from '../store/chat.store'
 
 export default function ChatPageView() {
@@ -23,13 +25,14 @@ export default function ChatPageView() {
         className={`w-full shrink-0 overflow-hidden border-r border-separator lg:block lg:w-80 ${selectedChatId ? 'hidden' : 'block'
           }`}
       >
-        <div className="flex h-full flex-col">
+        <div className="flex h-full flex-col relative">
           <div className="shrink-0 px-4 pt-4">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-extrabold text-(--foreground)">
                 Чаты
               </h2>
               <div className="flex gap-1">
+                <DiscoverGroupsModal />
                 <Button
                   isIconOnly
                   size="sm"
@@ -72,11 +75,14 @@ export default function ChatPageView() {
           ) : (
             <ChatList searchQuery={searchQuery} />
           )}
+          <div className="absolute bottom-4 right-4">
+            <CreateGroupChatModal />
+          </div>
         </div>
       </div>
 
       {isMobileChat && (
-        <div className="fixed inset-0 z-51 flex flex-col bg-surface lg:hidden">
+        <div className="fixed inset-0 z-40 flex flex-col bg-surface lg:hidden">
           <ChatConversation />
         </div>
       )}
