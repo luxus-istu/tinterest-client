@@ -194,10 +194,12 @@ export default function CreateGroupChatModal() {
                               className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-surface-secondary"
                             >
                               <Avatar size="sm">
-                                <Avatar.Image
-                                  alt={`${user.firstName} ${user.lastName}`}
-                                  src={user.avatarUrl ?? ''}
-                                />
+                                {user.avatarUrl && (
+                                  <Avatar.Image
+                                    alt={`${user.firstName} ${user.lastName}`}
+                                    src={user.avatarUrl}
+                                  />
+                                )}
                                 <Avatar.Fallback>
                                   {user.firstName[0]}
                                   {user.lastName[0]}

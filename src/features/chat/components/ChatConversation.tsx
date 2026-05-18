@@ -54,12 +54,16 @@ export default function ChatConversation() {
             <div className="bg-accent text-accent-foreground flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-bold">
               {displayTitle.charAt(0)}
             </div>
-          ) : (
+          ) : avatarUrl ? (
             <img
               alt={displayTitle}
-              src={avatarUrl ?? ''}
+              src={avatarUrl}
               className="size-9 rounded-full object-cover"
             />
+          ) : (
+            <div className="bg-accent text-accent-foreground flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-bold">
+              {displayTitle.charAt(0)}
+            </div>
           )}
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-(--foreground)">{displayTitle}</p>

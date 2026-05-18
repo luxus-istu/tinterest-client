@@ -56,18 +56,27 @@ export default function ChatList({ searchQuery }: { searchQuery: string }) {
             <div className="relative shrink-0">
               {isGroup ? (
                 <div className="grid size-10 grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-full">
-                  {chat.members?.slice(0, 4).map((m) => (
-                    <img
-                      key={m.userId}
-                      alt={fullName(m)}
-                      src={m.avatarUrl}
-                      className="size-full object-cover"
-                    />
-                  ))}
+                  {chat.members?.slice(0, 4).map((m) =>
+                    m.avatarUrl ? (
+                      <img
+                        key={m.userId}
+                        alt={fullName(m)}
+                        src={m.avatarUrl}
+                        className="size-full object-cover"
+                      />
+                    ) : (
+                      <div
+                        key={m.userId}
+                        className="bg-accent text-accent-foreground flex size-full items-center justify-center text-[10px] font-bold"
+                      >
+                        {m.firstName.charAt(0)}
+                      </div>
+                    ),
+                  )}
                 </div>
               ) : (
                 <Avatar size="md">
-                  <Avatar.Image alt={displayTitle} src={avatarUrl ?? ''} />
+                  {avatarUrl && <Avatar.Image alt={displayTitle} src={avatarUrl} />}
                   <Avatar.Fallback>
                     {displayTitle
                       .split(' ')

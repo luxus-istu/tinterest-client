@@ -67,10 +67,10 @@ export default function ChatMessage() {
                   </span>
                 </div>
               </div>
-              {isGroup && isMe && (
+              {isGroup && isMe && senderAvatar && (
                 <img
                   alt={senderName}
-                  src={senderAvatar ?? ''}
+                  src={senderAvatar}
                   className="size-6 shrink-0 rounded-full object-cover"
                 />
               )}
