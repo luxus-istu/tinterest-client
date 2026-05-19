@@ -6,8 +6,12 @@ interface AuthState {
   user?: User
   accessToken?: string
   role?: AuthRole
+  isAuthChecked: boolean
   isRefreshing: boolean
-  refreshSubscribers: Array<(token: string) => void>
+  refreshSubscribers: Array<{
+    onSuccess: (token: string) => void
+    onError: (error: unknown) => void
+  }>
 }
 
 interface AuthActions {
@@ -17,9 +21,11 @@ interface AuthActions {
   clearAuth: () => void
   setAccessToken: (token: string) => void
   clearSession: () => void
+  setAuthChecked: (value: boolean) => void
   setIsRefreshing: (value: boolean) => void
-  subscribeRefresh: (callback: (token: string) => void) => void
-  notifyRefresh: (token: string) => void
+  subscribeRefresh: (onSuccess: (token: string) => void, onError: (error: unknown) => void) => void
+  notifyRefreshSuccess: (token: string) => void
+  notifyRefreshError: (error: unknown) => void
 }
 
 interface AuthStore extends AuthState, AuthActions {}
@@ -28,6 +34,7 @@ const initialState: AuthState = {
   accessToken: undefined,
   role: undefined,
   user: undefined,
+  isAuthChecked: false,
   isRefreshing: false,
   refreshSubscribers: [],
 }
@@ -47,20 +54,34 @@ const useAuthStore = create<AuthStore>((set, get) => ({
   clearSession: () => {
     set({ user: undefined, accessToken: undefined, role: undefined, isRefreshing: false, refreshSubscribers: [] })
   },
+  setAuthChecked: (value) => {
+    set({ isAuthChecked: value })
+  },
   setIsRefreshing: (value) => {
     set({ isRefreshing: value })
   },
-  subscribeRefresh: (callback) => {
+  subscribeRefresh: (onSuccess, onError) => {
     const refreshSubscribers = get().refreshSubscribers
-    refreshSubscribers.push(callback)
+    refreshSubscribers.push({ onSuccess, onError })
     set({ refreshSubscribers: refreshSubscribers })
   },
-  notifyRefresh: (token) => {
+  notifyRefreshSuccess: (token) => {
     const subscribers = get().refreshSubscribers
     set({ refreshSubscribers: [] })
-    for (const cb of subscribers) {
+    for (const subscriber of subscribers) {
       try {
-        cb(token)
+        subscriber.onSuccess(token)
+      } catch {
+        // Subscriber error must not prevent other subscribers from running.
+      }
+    }
+  },
+  notifyRefreshError: (error) => {
+    const subscribers = get().refreshSubscribers
+    set({ refreshSubscribers: [] })
+    for (const subscriber of subscribers) {
+      try {
+        subscriber.onError(error)
       } catch {
         // Subscriber error must not prevent other subscribers from running.
       }

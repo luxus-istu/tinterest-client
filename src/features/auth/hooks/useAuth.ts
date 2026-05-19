@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import useAuthStore from '../store/auth.store'
 import { useMutation } from '@tanstack/react-query'
 import { authApi } from '../api/auth.api'
@@ -14,10 +14,11 @@ import type {
 import type { ErrorResponse } from '@/src/types'
 
 export const useAuth = () => {
-  const { user, accessToken, role, clearAuth, setAccessToken, setUser } = useAuthStore()
-  const [checked, setChecked] = useState(false)
+  const { user, accessToken, role, clearAuth, setAccessToken, setUser, isAuthChecked, setAuthChecked } = useAuthStore()
 
   useEffect(() => {
+    if (isAuthChecked) return
+
     authApi
       .refresh()
       .then((data) => {
@@ -28,18 +29,21 @@ export const useAuth = () => {
         setUser(profile)
       })
       .catch(() => {
-        clearAuth()
+        // Avoid wiping a fresh session if user logged in while bootstrap refresh was in flight.
+        if (!useAuthStore.getState().accessToken) {
+          clearAuth()
+        }
       })
       .finally(() => {
-        setChecked(true)
+        setAuthChecked(true)
       })
-  }, [clearAuth, setAccessToken, setUser])
+  }, [clearAuth, isAuthChecked, setAccessToken, setAuthChecked, setUser])
 
   return {
     user,
     role,
     isAuthenticated: !!accessToken,
-    isLoading: !checked,
+    isLoading: !isAuthChecked,
   }
 }
 

@@ -55,11 +55,16 @@ apiClient.interceptors.response.use(
       }
 
       if (useAuthStore.getState().isRefreshing) {
-        return new Promise((resolve) => {
-          useAuthStore.getState().subscribeRefresh((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`
-            resolve(apiClient(originalRequest))
-          })
+        return new Promise((resolve, reject) => {
+          useAuthStore.getState().subscribeRefresh(
+            (token) => {
+              originalRequest.headers.Authorization = `Bearer ${token}`
+              resolve(apiClient(originalRequest))
+            },
+            (refreshError) => {
+              reject(refreshError)
+            }
+          )
         })
       }
 
@@ -70,11 +75,12 @@ apiClient.interceptors.response.use(
         const refreshResponse = await apiClient.post('/auth/refresh')
         const newAccessToken = refreshResponse.data.accessToken as string
         useAuthStore.getState().setAccessToken(newAccessToken)
-        useAuthStore.getState().notifyRefresh(newAccessToken)
+        useAuthStore.getState().notifyRefreshSuccess(newAccessToken)
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
         return apiClient(originalRequest)
       } catch (refreshError) {
         useAuthStore.getState().clearSession()
+        useAuthStore.getState().notifyRefreshError(refreshError)
         if (axios.isAxiosError(refreshError) && refreshError.response?.data) {
           return Promise.reject(parseErrorResponse(refreshError.response.data))
         }
