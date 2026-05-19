@@ -13,7 +13,6 @@ export function useRecommendations() {
   const [refreshCounter, setRefreshCounter] = useState(0)
   const [page, setPage] = useState(0)
   const dataKeyRef = useRef<unknown>(undefined)
-  const [hasMore, setHasMore] = useState(true)
 
   const hasFilters = Object.values(filters).some(
     (v) => v !== undefined && (Array.isArray(v) ? v.length > 0 : true),
@@ -25,17 +24,20 @@ export function useRecommendations() {
       const response = hasFilters
         ? await matchingApi.getFilteredRecommendations(filters, page)
         : await matchingApi.getRecommendations(10)
-      setHasMore(response.hasMore)
-      return response.users.map(mapUserCardToProfile)
+      return {
+        hasMore: response.hasMore,
+        profiles: response.users.map(mapUserCardToProfile),
+      }
     },
     staleTime: 0,
   })
 
-  const data: MatchingProfile[] = useMemo(() => query.data ?? [], [query.data])
+  const data: MatchingProfile[] = useMemo(() => query.data?.profiles ?? [], [query.data])
+  const hasMore = query.data?.hasMore ?? true
 
   useEffect(() => {
-    if (query.data !== dataKeyRef.current) {
-      dataKeyRef.current = query.data ?? undefined
+    if (query.data?.profiles !== dataKeyRef.current) {
+      dataKeyRef.current = query.data?.profiles ?? undefined
       setIndex(0)
     }
   }, [query.data])
@@ -62,6 +64,12 @@ export function useRecommendations() {
     setRefreshCounter((prev) => prev + 1)
   }, [])
 
+  const updateFilters = useCallback((nextFilters: RecommendationFiltersDto) => {
+    setFilters(nextFilters)
+    setPage(0)
+    setIndex(0)
+  }, [])
+
   return {
     profiles,
     advance,
@@ -71,7 +79,7 @@ export function useRecommendations() {
     loadMore,
     needsMore,
     filters,
-    setFilters,
+    setFilters: updateFilters,
     refresh,
   }
 }

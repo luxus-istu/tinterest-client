@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, type PointerEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type PointerEvent } from 'react'
 import { SWIPE_THRESHOLD } from '../lib/labels'
 
 type SwipeDirection = 'like' | 'dislike'
@@ -27,6 +27,23 @@ export function useSwipe(onLike: () => void, onDislike: () => void) {
   const startPos = useRef({ x: 0, y: 0 })
   const currentPos = useRef({ x: 0, y: 0 })
   const isHorizontalSwipe = useRef(false)
+  const isAnimatingRef = useRef(false)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const onLikeRef = useRef(onLike)
+  const onDislikeRef = useRef(onDislike)
+
+  useEffect(() => {
+    onLikeRef.current = onLike
+    onDislikeRef.current = onDislike
+  }, [onLike, onDislike])
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
 
   const resetCard = useCallback(() => {
     setState((prev) => ({
@@ -38,10 +55,18 @@ export function useSwipe(onLike: () => void, onDislike: () => void) {
       isAnimating: false,
       direction: null,
     }))
+    isAnimatingRef.current = false
   }, [])
 
   const animateOut = useCallback(
     (dir: SwipeDirection) => {
+      if (isAnimatingRef.current) return
+
+      isAnimatingRef.current = true
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+
       const sign = dir === 'like' ? 1 : -1
       setState((prev) => ({
         ...prev,
@@ -53,21 +78,28 @@ export function useSwipe(onLike: () => void, onDislike: () => void) {
         isAnimating: true,
         isDragging: false,
       }))
-      setTimeout(() => (dir === 'like' ? onLike() : onDislike()), 400)
+      timeoutRef.current = setTimeout(() => {
+        timeoutRef.current = null
+        if (dir === 'like') {
+          onLikeRef.current()
+        } else {
+          onDislikeRef.current()
+        }
+      }, 400)
     },
-    [onLike, onDislike],
+    [],
   )
 
   const handlePointerDown = useCallback(
     (e: PointerEvent) => {
-      if (state.isAnimating) return
+      if (isAnimatingRef.current) return
       e.currentTarget.setPointerCapture(e.pointerId)
       isHorizontalSwipe.current = false
       startPos.current = { x: e.clientX, y: e.clientY }
       currentPos.current = { x: e.clientX, y: e.clientY }
       setState((prev) => ({ ...prev, isDragging: true }))
     },
-    [state.isAnimating],
+    [],
   )
 
   const handlePointerMove = useCallback(

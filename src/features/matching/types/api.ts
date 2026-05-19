@@ -38,8 +38,8 @@ export const SwipeRequestSchema = z.object({
 
 export const SwipeResponseSchema = z.object({
   result: z.string(),
-  matchId: z.number(),
-  chatId: z.number(),
+  matchId: z.number().nullable().optional(),
+  chatId: z.number().nullable().optional(),
 })
 
 export const RecommendationFiltersDtoSchema = z.object({
