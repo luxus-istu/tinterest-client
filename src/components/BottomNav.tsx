@@ -26,7 +26,7 @@ export default function BottomNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="border-separator fixed right-0 bottom-0 left-0 z-50 border-t bg-(--background)/80 backdrop-blur-lg">
+    <nav data-testid="navigation" className="border-separator fixed right-0 bottom-0 left-0 z-50 border-t bg-(--background)/80 backdrop-blur-lg">
       <div className="mx-auto flex h-16 max-w-md items-center justify-around px-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)

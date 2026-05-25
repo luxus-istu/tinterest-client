@@ -105,6 +105,7 @@ export default function CreateGroupChatModal() {
   return (
     <>
       <Button
+        data-testid="create-group-chat-button"
         isIconOnly
         size="lg"
         className="size-12 rounded-full shadow-lg"
@@ -188,6 +189,7 @@ export default function CreateGroupChatModal() {
                         <div className="max-h-48 overflow-y-auto rounded-xl border border-separator">
                           {filteredResults.map((user) => (
                             <button
+                              data-testid="user-search-result"
                               key={user.id}
                               type="button"
                               onClick={() => toggleUser(user)}

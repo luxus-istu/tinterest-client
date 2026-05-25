@@ -54,6 +54,7 @@ export default function ProfileCard({
 
         {/* Main card */}
         <div
+          data-testid="recommendation-card"
           ref={cardRef}
           {...handlers}
           style={{
@@ -64,8 +65,8 @@ export default function ProfileCard({
           }}
           className="relative z-10 cursor-grab select-none active:cursor-grabbing"
         >
-          <SwipeIndicator direction={direction} side="like" />
-          <SwipeIndicator direction={direction} side="dislike" />
+          <SwipeIndicator data-testid="like" direction={direction} side="like" />
+          <SwipeIndicator data-testid="dislike" direction={direction} side="dislike" />
           <ProfilePhoto
             profile={profile}
             onLike={handleLike}

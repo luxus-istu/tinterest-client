@@ -47,6 +47,7 @@ export default function ChatList({ searchQuery }: { searchQuery: string }) {
 
         return (
           <button
+            data-testid={"chatListItem"}
             key={chat.id}
             type="button"
             onClick={() => selectChat(chat.id)}

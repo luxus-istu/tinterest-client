@@ -31,10 +31,12 @@ export default function ChatInput() {
 
   return (
     <div
+      data-testid={"chatInput"}
       className="border-separator flex shrink-0 items-center gap-2 border-t bg-surface px-4 py-3"
       style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}
     >
       <input
+        data-testid={"chatInputField"}
         ref={inputRef}
         type="text"
         value={text}
@@ -44,6 +46,7 @@ export default function ChatInput() {
         className="w-full rounded-xl border-0 bg-surface-secondary px-4 py-2.5 text-sm text-(--foreground) outline-none placeholder:text-muted"
       />
       <Button
+        data-testid={"chatInputButton"}
         isIconOnly
         size="sm"
         className="shrink-0"

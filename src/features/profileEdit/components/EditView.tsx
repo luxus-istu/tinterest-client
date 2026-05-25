@@ -396,14 +396,14 @@ export function EditView() {
                 }}
               >
                 <Label>Цель</Label>
-                <Select.Trigger>
+                <Select.Trigger data-testid="goal-select">
                   <Select.Value />
                   <Select.Indicator />
                 </Select.Trigger>
                 <Select.Popover>
                   <ListBox>
                     {GOAL_OPTIONS.map((opt) => (
-                      <ListBox.Item key={opt.value} id={opt.value} textValue={opt.label}>
+                      <ListBox.Item data-testid={"goal-select-item-"+opt.value} key={opt.value} id={opt.value} textValue={opt.label}>
                         {opt.label}
                         <ListBox.ItemIndicator />
                       </ListBox.Item>
@@ -413,6 +413,7 @@ export function EditView() {
               </Select>
 
               <Select
+                
                 selectedKey={communicationPersonalityType || null}
                 onSelectionChange={(key) => {
                   if (typeof key === "string") {
@@ -421,14 +422,14 @@ export function EditView() {
                 }}
               >
                 <Label>Тип личности</Label>
-                <Select.Trigger>
+                <Select.Trigger data-testid="personality-type-select">
                   <Select.Value />
                   <Select.Indicator />
                 </Select.Trigger>
                 <Select.Popover>
                   <ListBox>
                     {PERSONALITY_TYPES.map((pt) => (
-                      <ListBox.Item key={pt.value} id={pt.value} textValue={pt.label}>
+                      <ListBox.Item data-testid={"personality-type-select-item-"+pt.value} key={pt.value} id={pt.value} textValue={pt.label}>
                         {pt.label}
                         <ListBox.ItemIndicator />
                       </ListBox.Item>
@@ -440,6 +441,7 @@ export function EditView() {
               <div className="grid gap-3 sm:grid-cols-2">
                 {TIME_SLOTS.map((slot) => (
                   <Checkbox
+                    data-testid={"time-slot-"+slot}
                     key={slot}
                     isSelected={communicationTimeSlots.includes(slot)}
                     onChange={(checked) => {

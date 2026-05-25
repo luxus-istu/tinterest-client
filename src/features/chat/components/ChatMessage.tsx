@@ -71,6 +71,7 @@ export default function ChatMessage() {
 
           return (
             <div
+              data-testid="message"
               key={msg.id}
               className={`flex items-end gap-2 ${isMe ? 'justify-end' : 'justify-start'}`}
             >

@@ -28,7 +28,7 @@ const ProfilePhoto = memo(function ProfilePhoto({
       {/* Name + chips - top left */}
       <div className="absolute top-5 left-5 z-20 flex flex-col items-start gap-2">
         <div className="rounded-2xl bg-black/40 px-4 py-1.5 backdrop-blur-md">
-          <span className="text-2xl font-bold text-white">
+          <span data-testid="card-name" className="text-2xl font-bold text-white">
             {profile.firstName}, {profile.age}
           </span>
         </div>
@@ -59,6 +59,7 @@ const ProfilePhoto = memo(function ProfilePhoto({
       {/* Action buttons - bottom of photo */}
       <div className="absolute right-0 bottom-6 left-0 z-20 flex items-center justify-between px-16">
         <Button
+          data-testid="dislike"
           isIconOnly
           size="lg"
           onPress={onDislike}
@@ -68,6 +69,7 @@ const ProfilePhoto = memo(function ProfilePhoto({
           <X size={32} strokeWidth={3} className="text-white" />
         </Button>
         <Button
+          data-testid="like"
           isIconOnly
           size="lg"
           onPress={onLike}

@@ -100,6 +100,7 @@ export default function MatchingPageView() {
           </div>
         ) : currentProfile ? (
           <ProfileCard
+            data-testid="recommendation-card"
             key={currentProfile.id}
             profile={currentProfile}
             nextProfile={nextProfile}
