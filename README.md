@@ -107,6 +107,63 @@ Automated workflows via GitHub Actions:
 
 ---
 
+## 🧪 Testing
+
+Automated end-to-end tests powered by [Playwright](https://playwright.dev/).
+
+### Prerequisites
+
+- Local [Spring Boot backend](https://github.com/luxus-istu/tinterest-backend) running
+- Application running on `http://localhost:3000`
+- Test admin accounts configured on the backend (3 accounts for parallel execution)
+
+### Installation
+
+```bash
+bun playwright install
+```
+
+### Running Tests
+
+| Command | Description |
+| :------------------- | :--------------------------------------- |
+| `bun playwright test` | Run all tests in headless mode |
+| `bun playwright test --headed` | Run all tests with browser UI |
+| `bun playwright test --ui` | Open interactive Playwright UI |
+| `bun playwright test tests/admin/` | Run specific folder |
+| `bun playwright test --workers=1` | Run sequentially (no parallelism) |
+
+### Viewing Reports
+
+```bash
+bun playwright show-report
+```
+
+### Project Structure
+
+```text
+tests/
+├── fixtures.ts          # Auth fixtures (loginAsAdmin)
+├── admin/               # Admin panel tests
+├── matching/            # Matching feature tests
+├── profile/             # Profile editing tests
+└── chatting/            # Chat feature tests
+```
+
+### Architecture
+
+- **Auth**: Each worker logs in independently via `loginAsAdmin()` fixture to avoid token conflicts
+- **Parallelism**: Workers use separate admin accounts to prevent `REFRESH_TOKEN_REUSE_DETECTED` errors
+- **Mocking**: API routes are mocked per-page via `page.route()` inside each test
+
+### Notes
+
+> ⚠️ Do not import directly from `@playwright/test` — always use `../fixtures` instead
+>
+> ⚠️ The `auth/` folder is gitignored and should never be committed
+
+---
+
 ## 📄 License
 
 This project is licensed under the [MIT License](LICENSE).
