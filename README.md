@@ -154,7 +154,6 @@ tests/
 
 - **Auth**: Each worker logs in independently via `loginAsAdmin()` fixture to avoid token conflicts
 - **Parallelism**: Workers use separate admin accounts to prevent `REFRESH_TOKEN_REUSE_DETECTED` errors
-- **Mocking**: API routes are mocked per-page via `page.route()` inside each test
 
 ### Notes
 
