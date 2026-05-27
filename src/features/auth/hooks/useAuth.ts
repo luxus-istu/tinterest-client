@@ -18,18 +18,14 @@ export const useAuth = () => {
 
   useEffect(() => {
     if (isAuthChecked) return
-
-    authApi
-      .refresh()
-      .then((data) => {
-        setAccessToken(data.accessToken)
-        return profileApi.getMe()
-      })
+    useAuthStore
+      .getState()
+      .bootstrap()
+      .then(() => profileApi.getMe())
       .then((profile) => {
         setUser(profile)
       })
       .catch(() => {
-        // Avoid wiping a fresh session if user logged in while bootstrap refresh was in flight.
         if (!useAuthStore.getState().accessToken) {
           clearAuth()
         }
