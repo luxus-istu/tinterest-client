@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import useAuthStore from '../store/auth.store'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { authApi } from '../api/auth.api'
 import { profileApi } from '../api/profile.api'
 import type {
@@ -46,6 +46,7 @@ export const useAuth = () => {
 export const useAuthActions = () => {
   const { setAccessToken } = useAuthStore()
   const { clearAuth } = useAuthStore()
+  const queryClient = useQueryClient();
 
   const registerMutation = useMutation({
     mutationFn: (data: RegisterRequest) => authApi.register(data),
@@ -62,6 +63,7 @@ export const useAuthActions = () => {
     mutationFn: () => authApi.logout(),
     onSuccess: () => {
       clearAuth()
+      queryClient.clear();
     },
   })
 
