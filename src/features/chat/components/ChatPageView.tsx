@@ -111,6 +111,7 @@ export default function ChatPageView() {
 
       {isMobileChat && (
         <div
+          data-testid="mobile-chat"
           ref={mobileRef}
           className="fixed inset-x-0 top-0 z-[60] flex h-dvh flex-col bg-surface lg:hidden"
         >
@@ -118,7 +119,7 @@ export default function ChatPageView() {
         </div>
       )}
 
-      <div className="hidden flex-1 flex-col overflow-hidden lg:flex">
+      <div data-testid="desktop-chat" className="hidden flex-1 flex-col overflow-hidden lg:flex">
         {selectedChatId ? (
           <ChatConversation />
         ) : (

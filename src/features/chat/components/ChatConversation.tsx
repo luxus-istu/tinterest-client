@@ -46,7 +46,7 @@ export default function ChatConversation() {
         variant="default"
         className="border-separator flex shrink-0 items-center gap-3 border-b px-4 py-3"
       >
-        <Button isIconOnly size="sm" variant="ghost" className="lg:hidden" onPress={goBack}>
+        <Button data-testid="back-btn" isIconOnly size="sm" variant="ghost" className="lg:hidden" onPress={goBack}>
           <ArrowLeft size={20} />
         </Button>
         <div className="flex min-w-0 flex-1 items-center gap-3">
