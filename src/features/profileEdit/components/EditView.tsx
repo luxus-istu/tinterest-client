@@ -116,7 +116,6 @@ export function EditView() {
     },
   });
 
-  // Форма интересов (будет отдельный компонент с чекбоксами из API)
   const interestsForm = useForm<InterestsEditFormValues>({
     resolver: zodResolver(InterestsEditSchema),
     defaultValues: {
@@ -270,25 +269,25 @@ export function EditView() {
           <CardContent>
              <form onSubmit={basicForm.handleSubmit(onSubmitBasic)} className="flex flex-col gap-4">
               <TextField isInvalid={!!basicForm.formState.errors.firstName}>
-                <Label>Имя</Label>
-                <Input {...basicForm.register("firstName")} />
+                <Label htmlFor="firstName">Имя</Label>
+                <Input id="firstName" placeholder="Имя" {...basicForm.register("firstName")} />
                 <FieldError>{basicForm.formState.errors.firstName?.message}</FieldError>
               </TextField>
 
               <TextField isInvalid={!!basicForm.formState.errors.lastName}>
-                <Label>Фамилия</Label>
-                <Input {...basicForm.register("lastName")} />
+                <Label htmlFor="lastName">Фамилия</Label>
+                <Input id="lastName" placeholder="Фамилия" {...basicForm.register("lastName")} />
                 <FieldError>{basicForm.formState.errors.lastName?.message}</FieldError>
               </TextField>
 
               <TextField>
-                <Label>Отчество</Label>
-                <Input {...basicForm.register("middleName")} />
+                <Label htmlFor="middleName">Отчество</Label>
+                <Input id="middleName" placeholder="Отчество" {...basicForm.register("middleName")} />
               </TextField>
 
               <TextField type="date" isInvalid={!!basicForm.formState.errors.dateOfBirth}>
-                <Label>Дата рождения</Label>
-                <Input {...basicForm.register("dateOfBirth")} />
+                <Label htmlFor="dateOfBirth">Дата рождения</Label>
+                <Input id="dateOfBirth" placeholder="ГГГГ-ММ-ДД" {...basicForm.register("dateOfBirth")} />
                 <FieldError>{basicForm.formState.errors.dateOfBirth?.message}</FieldError>
               </TextField>
 
@@ -300,7 +299,7 @@ export function EditView() {
                   }
                 }}
               >
-                <Label>Пол</Label>
+                <Label htmlFor="gender">Пол</Label>
                 <Select.Trigger>
                   <Select.Value />
                   <Select.Indicator />
@@ -327,7 +326,7 @@ export function EditView() {
                   }
                 }}
               >
-                <Label>Язык интерфейса</Label>
+                <Label htmlFor="language">Язык интерфейса</Label>
                 <Select.Trigger>
                   <Select.Value />
                   <Select.Indicator />
@@ -348,7 +347,7 @@ export function EditView() {
 
               <TextField isInvalid={!!basicForm.formState.errors.city}>
                 <Label>Город</Label>
-                <Input {...basicForm.register("city")} />
+                <Input aria-label="Город" {...basicForm.register("city")} />
                 <FieldError>{basicForm.formState.errors.city?.message}</FieldError>
               </TextField>
               <Label htmlFor="textarea">О себе</Label>

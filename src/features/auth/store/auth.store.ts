@@ -12,6 +12,11 @@ interface AuthState {
     onSuccess: (token: string) => void
     onError: (error: unknown) => void
   }>
+  isBootstrapping: boolean
+  bootstrapSubscribers: Array<{
+    onSuccess: () => void
+    onError: (error: unknown) => void
+  }>
 }
 
 interface AuthActions {
@@ -26,6 +31,10 @@ interface AuthActions {
   subscribeRefresh: (onSuccess: (token: string) => void, onError: (error: unknown) => void) => void
   notifyRefreshSuccess: (token: string) => void
   notifyRefreshError: (error: unknown) => void
+  subscribeBootstrap: (onSuccess: () => void, onError: (error: unknown) => void) => void
+  notifyBootstrapSuccess: () => void
+  notifyBootstrapError: (error: unknown) => void
+  bootstrap: () => Promise<void>
 }
 
 interface AuthStore extends AuthState, AuthActions {}
@@ -37,6 +46,8 @@ const initialState: AuthState = {
   isAuthChecked: false,
   isRefreshing: false,
   refreshSubscribers: [],
+  isBootstrapping: false,
+  bootstrapSubscribers: [],
 }
 
 const useAuthStore = create<AuthStore>((set, get) => ({
@@ -52,7 +63,7 @@ const useAuthStore = create<AuthStore>((set, get) => ({
   setAccessToken: (token) =>
     set({ accessToken: token, role: getRoleFromJwt(token) }),
   clearSession: () => {
-    set({ user: undefined, accessToken: undefined, role: undefined, isRefreshing: false, refreshSubscribers: [] })
+    set({ user: undefined, accessToken: undefined, role: undefined, isRefreshing: false, refreshSubscribers: [], isBootstrapping: false, bootstrapSubscribers: [] })
   },
   setAuthChecked: (value) => {
     set({ isAuthChecked: value })
@@ -72,7 +83,6 @@ const useAuthStore = create<AuthStore>((set, get) => ({
       try {
         subscriber.onSuccess(token)
       } catch {
-        // Subscriber error must not prevent other subscribers from running.
       }
     }
   },
@@ -83,8 +93,57 @@ const useAuthStore = create<AuthStore>((set, get) => ({
       try {
         subscriber.onError(error)
       } catch {
-        // Subscriber error must not prevent other subscribers from running.
       }
+    }
+  },
+  subscribeBootstrap: (onSuccess, onError) => {
+    const bootstrapSubscribers = get().bootstrapSubscribers
+    bootstrapSubscribers.push({ onSuccess, onError })
+    set({ bootstrapSubscribers: bootstrapSubscribers })
+  },
+  notifyBootstrapSuccess: () => {
+    const subscribers = get().bootstrapSubscribers
+    set({ bootstrapSubscribers: [] })
+    for (const subscriber of subscribers) {
+      try {
+        subscriber.onSuccess()
+      } catch {
+      }
+    }
+  },
+  notifyBootstrapError: (error) => {
+    const subscribers = get().bootstrapSubscribers
+    set({ bootstrapSubscribers: [] })
+    for (const subscriber of subscribers) {
+      try {
+        subscriber.onError(error)
+      } catch {
+      }
+    }
+  },
+
+  bootstrap: async () => {
+    if (get().isBootstrapping) {
+      return new Promise<void>((resolve, reject) => {
+        get().subscribeBootstrap(resolve, reject)
+      })
+    }
+
+    set({ isBootstrapping: true })
+    try {
+      const mod = await import('@/src/features/auth/api/auth.api')
+      if (!mod?.authApi?.refresh) throw new Error('authApi.refresh not available')
+      const data = await mod.authApi.refresh()
+      if (data?.accessToken) {
+        get().setAccessToken(data.accessToken)
+      }
+      get().notifyBootstrapSuccess()
+    } catch (err) {
+      get().clearSession()
+      get().notifyBootstrapError(err)
+      throw err
+    } finally {
+      set({ isBootstrapping: false })
     }
   },
 }))
