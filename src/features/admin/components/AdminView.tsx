@@ -28,7 +28,6 @@ export function AdminView() {
     setSearchText,
     usersPage,
     setUsersPage,
-    usersPageSize,
     interestsPage,
     setInterestsPage,
     interestsPageSize,
@@ -39,7 +38,7 @@ export function AdminView() {
   } = useAdmin()
 
   const users = usersQuery.data?.content ?? []
-  const interests = interestsQuery.data ?? []
+  const interests = useMemo(() => interestsQuery.data ?? [], [interestsQuery.data])
   const pagedInterests = useMemo(() => {
     const start = interestsPage * interestsPageSize
     return interests.slice(start, start + interestsPageSize)
