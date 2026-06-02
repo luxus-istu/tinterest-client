@@ -177,6 +177,12 @@ export function EditView() {
     control: interestsForm.control,
     name: "interests",
   }) ?? [];
+  const aboutValue = useWatch({
+    control: basicForm.control,
+    name: "about",
+  }) || "";
+  
+  const MAX_ABOUT_LENGTH = 500;
 
   const onSubmitBasic: SubmitHandler<BasicInfoEditFormValues> = (values) => {
     basicMutation.mutate(values);
@@ -351,7 +357,10 @@ export function EditView() {
                 <FieldError>{basicForm.formState.errors.city?.message}</FieldError>
               </TextField>
               <Label htmlFor="textarea">О себе</Label>
-              <TextArea id="textarea" placeholder="О себе" {...basicForm.register("about")} />
+              <TextArea id="textarea" placeholder="О себе" maxLength={MAX_ABOUT_LENGTH} {...basicForm.register("about")} />
+              <div className="text-right text-xs text-gray-500">
+                {aboutValue.length} / {MAX_ABOUT_LENGTH}
+              </div>
 
               <Button type="submit" variant="primary" isDisabled={basicMutation.isPending}>
                 Сохранить основную информацию
