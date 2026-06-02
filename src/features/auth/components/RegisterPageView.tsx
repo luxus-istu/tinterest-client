@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, Spinner } from '@heroui/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import RegisterForm from './RegisterForm'
 import VerifyOtpForm from './VerifyOtpForm'
@@ -13,8 +13,12 @@ type RegisterStep = 'register' | 'verify' | 'verified'
 export default function RegisterPageView() {
   const { isLoading } = useAuthGuard({ requireAuth: false, redirectTo: '/matching' })
   const router = useRouter()
-  const [step, setStep] = useState<RegisterStep>('register')
-  const [registeredEmail, setRegisteredEmail] = useState<string>('')
+  const searchParams = useSearchParams()
+  const initialStep = (searchParams.get('step') as RegisterStep) || 'register'
+  const initialEmail = searchParams.get('email') || ''
+
+  const [step, setStep] = useState<RegisterStep>(initialStep)
+  const [registeredEmail, setRegisteredEmail] = useState<string>(initialEmail)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   useEffect(() => {

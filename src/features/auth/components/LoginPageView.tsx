@@ -32,6 +32,10 @@ export function LoginPageView() {
       setUser(profile);
       router.push(profile.hasFilledProfile ? "/matching" : "/onboarding");
     } catch (err: unknown) {
+      if (err instanceof ApiError && err.code === "EMAIL_NOT_VERIFIED") {
+        router.push(`/register?step=verify&email=${encodeURIComponent(data.email)}`);
+        return;
+      }
       const message = err instanceof ApiError
         ? err.message
         : err instanceof Error
