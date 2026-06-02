@@ -1,6 +1,7 @@
 'use client'
 
 import { Avatar } from '@heroui/react'
+import Image from 'next/image'
 import useChatStore from '../store/chat.store'
 import useAuthStore from '@/src/features/auth/store/auth.store'
 import type { ChatSummary, ChatMember } from '../types'
@@ -24,10 +25,10 @@ export default function ChatList({ searchQuery }: { searchQuery: string }) {
       const isGroup = chat.type === 'GROUP'
       const other = getOtherMember(chat)
       const title = isGroup
-        ? chat.title ?? ''
+        ? (chat.title ?? 'Группа')
         : other
           ? fullName(other)
-          : chat.title ?? ''
+          : (chat.title ?? 'Чат')
       return title.toLowerCase().includes(q)
     })
     .sort(
@@ -42,7 +43,7 @@ export default function ChatList({ searchQuery }: { searchQuery: string }) {
         const isActive = selectedChatId === chat.id
         const isGroup = chat.type === 'GROUP'
         const other = getOtherMember(chat)
-        const displayTitle = isGroup ? chat.title : (other ? fullName(other) : chat.title)
+        const displayTitle = isGroup ? (chat.title ?? 'Группа') : (other ? fullName(other) : (chat.title ?? 'Чат'))
         const avatarUrl = isGroup ? undefined : other?.avatarUrl
 
         return (
@@ -58,10 +59,12 @@ export default function ChatList({ searchQuery }: { searchQuery: string }) {
                 <div className="grid size-10 grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden rounded-full">
                   {chat.members?.slice(0, 4).map((m) =>
                     m.avatarUrl ? (
-                      <img
+                      <Image
                         key={m.userId}
                         alt={fullName(m)}
                         src={m.avatarUrl}
+                        width={20}
+                        height={20}
                         className="size-full object-cover"
                       />
                     ) : (
@@ -69,7 +72,7 @@ export default function ChatList({ searchQuery }: { searchQuery: string }) {
                         key={m.userId}
                         className="bg-accent text-accent-foreground flex size-full items-center justify-center text-[10px] font-bold"
                       >
-                        {m.firstName.charAt(0)}
+                        {(m.firstName || 'U').charAt(0)}
                       </div>
                     ),
                   )}

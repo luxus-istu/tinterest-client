@@ -2,6 +2,7 @@
 
 import { Button, Surface } from '@heroui/react'
 import { ArrowLeft } from 'lucide-react'
+import Image from 'next/image'
 import ChatMessage from './ChatMessage'
 import ChatInput from './ChatInput'
 import GroupEditModal from './GroupEditModal'
@@ -37,7 +38,7 @@ export default function ChatConversation() {
   const isGroup = chat.type === 'GROUP'
   const isOwner = isCurrentUserGroupOwner(chat, user?.id)
   const other = getOtherMember(chat)
-  const displayTitle = isGroup ? chat.title : other ? fullName(other) : chat.title
+  const displayTitle = isGroup ? (chat.title ?? 'Группа') : other ? fullName(other) : (chat.title ?? 'Чат')
   const avatarUrl = isGroup ? undefined : other?.avatarUrl
 
   return (
@@ -55,9 +56,11 @@ export default function ChatConversation() {
               {displayTitle.charAt(0)}
             </div>
           ) : avatarUrl ? (
-            <img
+            <Image
               alt={displayTitle}
               src={avatarUrl}
+              width={36}
+              height={36}
               className="size-9 rounded-full object-cover"
             />
           ) : (

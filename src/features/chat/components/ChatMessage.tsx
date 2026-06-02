@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { Spinner } from '@heroui/react'
+import Image from 'next/image'
 import useChatStore from '../store/chat.store'
 import useAuthStore from '@/src/features/auth/store/auth.store'
 import type { ChatMember } from '../types'
@@ -75,9 +76,11 @@ export default function ChatMessage() {
               className={`flex items-end gap-2 ${isMe ? 'justify-end' : 'justify-start'}`}
             >
               {isGroup && !isMe && senderAvatar && (
-                <img
+                <Image
                   alt={senderName}
                   src={senderAvatar}
+                  width={24}
+                  height={24}
                   className="size-6 shrink-0 rounded-full object-cover"
                 />
               )}
@@ -103,9 +106,11 @@ export default function ChatMessage() {
                 </div>
               </div>
               {isGroup && isMe && senderAvatar && (
-                <img
+                <Image
                   alt={senderName}
                   src={senderAvatar}
+                  width={24}
+                  height={24}
                   className="size-6 shrink-0 rounded-full object-cover"
                 />
               )}

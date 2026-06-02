@@ -82,7 +82,7 @@ export default function DiscoverGroupsModal() {
                     >
                       <Avatar size="sm">
                         <Avatar.Fallback>
-                          {group.title.charAt(0).toUpperCase()}
+                          {(group.title || 'Группа').charAt(0).toUpperCase()}
                         </Avatar.Fallback>
                       </Avatar>
                       <div className="min-w-0 flex-1">
