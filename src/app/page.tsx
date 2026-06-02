@@ -2,6 +2,7 @@
 
 import { Button, Spinner } from '@heroui/react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useAuthGuard } from '@/src/features/auth/hooks/useAuthGuard'
 
@@ -26,7 +27,7 @@ export default function Home() {
       <div className="z-10 flex w-full max-w-100.5 flex-col items-center px-4 py-8">
         {/* Logo and App Name */}
         <div className="mb-4 flex items-center justify-center gap-3">
-          <img src={'/T-bank-logo.svg'} alt="logo" className="h-[52px] w-[52px]" />
+          <Image src='/T-bank-logo.svg' alt="logo" width={'52'} height={'52'} />
           <h1 className="text-5xl font-black leading-none tracking-tight">Tinterest</h1>
         </div>
 
