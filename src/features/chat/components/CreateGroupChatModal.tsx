@@ -201,8 +201,8 @@ export default function CreateGroupChatModal() {
                                   />
                                 )}
                                 <Avatar.Fallback>
-                                  {user.firstName[0]}
-                                  {user.lastName[0]}
+                                  {user.firstName?.[0]}
+                                  {user.lastName?.[0]}
                                 </Avatar.Fallback>
                               </Avatar>
                               <span className="text-sm">
