@@ -13,6 +13,7 @@ import type { LoginRequest } from "@/src/features/auth/types";
 import { ApiError } from "@/src/lib/api";
 import { profileApi } from "@/src/features/auth/api/profile.api";
 import useAuthStore from "@/src/features/auth/store/auth.store";
+import YandexCaptcha from "./YandexCaptcha";
 
 export function LoginPageView() {
   const { isLoading } = useAuthGuard({ requireAuth: false, redirectTo: '/matching' })
@@ -21,11 +22,16 @@ export function LoginPageView() {
   });
   const { login, isLogging } = useAuthActions();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [token, setToken] = useState<string>('');
   const router = useRouter();
   const setUser = useAuthStore((s) => s.setUser);
 
   const onSubmit: SubmitHandler<LoginRequest> = useCallback(async (data) => {
     setErrorMessage(null);
+    if (token.trim().length <= 0) {
+      setErrorMessage("Failed to verify captcha");
+      return
+    }
     try {
       await login(data);
       const profile = await profileApi.getMe();
@@ -67,10 +73,10 @@ export function LoginPageView() {
             {errorMessage && (
               <div className="relative rounded-lg bg-danger/10 p-3 pr-10 text-center text-sm text-danger">
                 {errorMessage}
-            <CloseButton
-              className="absolute right-2 top-1/2 -translate-y-1/2"
-              onPress={() => setErrorMessage(null)}
-            />
+                <CloseButton
+                  className="absolute right-2 top-1/2 -translate-y-1/2"
+                  onPress={() => setErrorMessage(null)}
+                />
               </div>
             )}
 
@@ -94,6 +100,7 @@ export function LoginPageView() {
               <FieldError>{errors.password?.message}</FieldError>
             </TextField>
           </Card.Content>
+          <YandexCaptcha onSuccess={setToken} />
           <Card.Footer className="flex flex-col gap-4 pt-2">
             <Button className="w-full" size="lg" type="submit" isDisabled={isLogging}>
               Войти
