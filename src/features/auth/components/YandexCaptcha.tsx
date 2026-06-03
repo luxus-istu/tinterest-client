@@ -7,7 +7,7 @@ interface YandexCaptchaProps {
 }
 
 export default function YandexCaptcha({ onSuccess }: YandexCaptchaProps) {
-  const isDev = process.env.NODE_ENV === 'development' ? false : true;
+  const isDev = process.env.NODE_ENV === 'development' ? true : false;
   const sitekey = process.env.NEXT_PUBLIC_CAPTCHA_SITEKEY || "";
 
   return (
