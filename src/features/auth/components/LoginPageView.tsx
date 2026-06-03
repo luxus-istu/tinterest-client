@@ -31,10 +31,6 @@ export function LoginPageView() {
 
   const onSubmit: SubmitHandler<LoginForm> = useCallback(async (data) => {
     setErrorMessage(null);
-    if (token.trim().length <= 0) {
-      setErrorMessage("Failed to verify captcha");
-      return
-    }
     try {
       await login({ ...data, captchaToken: token });
       const profile = await profileApi.getMe();

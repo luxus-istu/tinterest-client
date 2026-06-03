@@ -56,10 +56,6 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
 
   const onSubmit: SubmitHandler<RegisterFormType> = useCallback(async (data) => {
     setErrorMessage(null)
-    if (token.trim().length <= 0) {
-      setErrorMessage("Failed to verify captcha");
-      return
-    }
     try {
       const response = await registerAction({ ...data, captchaToken: token })
       onSuccess(response.email)
