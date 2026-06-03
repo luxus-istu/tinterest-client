@@ -25,6 +25,7 @@ import { Controller, type SubmitHandler, useForm } from 'react-hook-form'
 import { useAuthActions } from '@/src/features/auth/hooks/useAuth'
 import { RegisterRequestSchema } from '@/src/features/auth/types'
 import type { RegisterRequest } from '@/src/features/auth/types'
+import YandexCaptcha from "./YandexCaptcha";
 import { ApiError } from '@/src/lib/api'
 
 interface RegisterFormProps {
@@ -48,9 +49,14 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
 
   const { register: registerAction, isRegistering } = useAuthActions()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [token, setToken] = useState<string>('');
 
   const onSubmit: SubmitHandler<RegisterRequest> = useCallback(async (data) => {
     setErrorMessage(null)
+    if (token.trim().length <= 0) {
+      setErrorMessage("Failed to verify captcha");
+      return
+    }
     try {
       const response = await registerAction(data)
       onSuccess(response.email)
@@ -230,6 +236,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           <FieldError>{errors.password?.message}</FieldError>
         </TextField>
       </Card.Content>
+      <YandexCaptcha onSuccess={setToken} />
       <Card.Footer className="flex flex-col gap-4 pt-2">
         <Button className="w-full" size="lg" type="submit" isDisabled={isRegistering}>
           Зарегистрироваться
