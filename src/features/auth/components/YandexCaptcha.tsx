@@ -11,6 +11,6 @@ export default function YandexCaptcha({ onSuccess }: YandexCaptchaProps) {
   const sitekey = process.env.NEXT_PUBLIC_CAPTCHA_SITEKEY || "";
 
   return (
-    <SmartCaptcha theme='dark' sitekey={sitekey} test onSuccess={onSuccess} />
+    <SmartCaptcha theme='dark' sitekey={sitekey} test={isDev} onSuccess={onSuccess} />
   );
 }
