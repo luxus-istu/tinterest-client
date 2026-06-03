@@ -26,6 +26,7 @@ describe("authApi", () => {
       gender: "MALE",
       dateOfBirth: "2000-01-01",
       language: "ru",
+      captchaToken: "test-token",
     });
 
     expect(mockedPost).toHaveBeenCalledWith("/auth/register", expect.any(Object));
@@ -74,6 +75,7 @@ describe("authApi", () => {
     const response = await authApi.login({
       email: "demo@tinterest.ru",
       password: "password123",
+      captchaToken: "test-token",
     });
 
     expect(mockedPost).toHaveBeenCalledWith("/auth/login", expect.any(Object));
@@ -86,6 +88,7 @@ describe("authApi", () => {
       authApi.login({
         email: "wrong@tinterest.ru",
         password: "wrong",
+        captchaToken: "test-token",
       })
     ).rejects.toThrow("Invalid credentials");
   });

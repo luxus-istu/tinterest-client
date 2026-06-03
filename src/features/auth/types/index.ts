@@ -8,6 +8,7 @@ export const RegisterRequestSchema = z.object({
   gender: z.enum(["MALE", "FEMALE"]),
   dateOfBirth: z.string(),
   language: z.enum(["ru", "en"]),
+  captchaToken: z.string().min(1, "Captcha is required"),
 });
 
 export const RegisterResponseSchema = z.object({
@@ -35,6 +36,7 @@ export const ResendEmailOtpResponseSchema = z.object({
 export const LoginRequestSchema = z.object({
   email: z.string().min(3),
   password: z.string().min(8),
+  captchaToken: z.string().min(1, "Captcha is required"),
 });
 
 export const LoginResponseSchema = z.object({

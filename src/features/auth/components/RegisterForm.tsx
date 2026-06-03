@@ -24,7 +24,7 @@ import { useCallback, useState } from 'react'
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form'
 import { useAuthActions } from '@/src/features/auth/hooks/useAuth'
 import { RegisterRequestSchema } from '@/src/features/auth/types'
-import type { RegisterRequest } from '@/src/features/auth/types'
+import { z } from 'zod'
 import YandexCaptcha from "./YandexCaptcha";
 import { ApiError } from '@/src/lib/api'
 
@@ -33,13 +33,16 @@ interface RegisterFormProps {
 }
 
 export default function RegisterForm({ onSuccess }: RegisterFormProps) {
+  const RegisterFormSchema = RegisterRequestSchema.omit({ captchaToken: true });
+  type RegisterFormType = z.infer<typeof RegisterFormSchema>;
+
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<RegisterRequest>({
-    resolver: zodResolver(RegisterRequestSchema),
+  } = useForm<RegisterFormType>({
+    resolver: zodResolver(RegisterFormSchema),
     defaultValues: {
       gender: 'MALE',
       language: 'ru',
@@ -51,14 +54,14 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [token, setToken] = useState<string>('');
 
-  const onSubmit: SubmitHandler<RegisterRequest> = useCallback(async (data) => {
+  const onSubmit: SubmitHandler<RegisterFormType> = useCallback(async (data) => {
     setErrorMessage(null)
     if (token.trim().length <= 0) {
       setErrorMessage("Failed to verify captcha");
       return
     }
     try {
-      const response = await registerAction(data)
+      const response = await registerAction({ ...data, captchaToken: token })
       onSuccess(response.email)
     } catch (err: unknown) {
       const message = err instanceof ApiError
@@ -68,7 +71,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           : 'Registration failed'
       setErrorMessage(message)
     }
-  }, [registerAction, onSuccess])
+  }, [registerAction, onSuccess, token])
 
   return (
     <Form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
