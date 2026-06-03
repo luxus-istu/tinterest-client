@@ -9,7 +9,7 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import { useAuthActions } from "@/src/features/auth/hooks/useAuth";
 import { useAuthGuard } from "@/src/features/auth/hooks/useAuthGuard";
 import { LoginRequestSchema } from "@/src/features/auth/types";
-import type { LoginRequest } from "@/src/features/auth/types";
+import { z } from "zod";
 import { ApiError } from "@/src/lib/api";
 import { profileApi } from "@/src/features/auth/api/profile.api";
 import useAuthStore from "@/src/features/auth/store/auth.store";
@@ -17,8 +17,11 @@ import YandexCaptcha from "./YandexCaptcha";
 
 export function LoginPageView() {
   const { isLoading } = useAuthGuard({ requireAuth: false, redirectTo: '/matching' })
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginRequest>({
-    resolver: zodResolver(LoginRequestSchema),
+  const LoginFormSchema = LoginRequestSchema.omit({ captchaToken: true });
+  type LoginForm = z.infer<typeof LoginFormSchema>;
+
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
+    resolver: zodResolver(LoginFormSchema),
   });
   const { login, isLogging } = useAuthActions();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -26,14 +29,10 @@ export function LoginPageView() {
   const router = useRouter();
   const setUser = useAuthStore((s) => s.setUser);
 
-  const onSubmit: SubmitHandler<LoginRequest> = useCallback(async (data) => {
+  const onSubmit: SubmitHandler<LoginForm> = useCallback(async (data) => {
     setErrorMessage(null);
-    if (token.trim().length <= 0) {
-      setErrorMessage("Failed to verify captcha");
-      return
-    }
     try {
-      await login(data);
+      await login({ ...data, captchaToken: token });
       const profile = await profileApi.getMe();
       setUser(profile);
       router.push(profile.hasFilledProfile ? "/matching" : "/onboarding");
@@ -49,7 +48,7 @@ export function LoginPageView() {
           : "Invalid account or password";
       setErrorMessage(message);
     }
-  }, [login, router, setUser]);
+  }, [login, router, setUser, token]);
 
   if (isLoading) {
     return (
